@@ -1,0 +1,45 @@
+{
+  "problem_id": 1,
+  "source_files": {
+    "ground_truth": "mbpp_pro/1.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/1.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/1.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a python function to identify non-prime numbers.\nimport math",
+    "new_problem": "# Write a Python function to identify the first N non-prime numbers in a given range [start, end]. If the count of non-prime numbers in the range is less than N, return all non-prime numbers found."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code checks if a given number is not prime by returning True if it has any divisors other than 1 and itself.",
+    "new_problem": "The code finds a specified number of prime numbers within a given range and returns them in a list."
+  },
+  "judge_evaluation": {
+    "problem_id": 1,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 1.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 1.0,
+    "robustness_to_obfuscation": 2.0,
+    "overall_score": 2.5,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: identify non-prime numbers. The obfuscated raw solution returns True if the input number is 1 or has any divisor from 2 to sqrt(n), and False otherwise. That is exactly a non-prime test (composite or 1). Qwen's inferred raw description: \"The code checks if a given number is not prime by returning True if it has any divisors other than 1 and itself.\" This is semantically correct: it captures that the function is a non-prime checker and describes the divisor-based logic. It omits the explicit mention of the special case for 1, but conceptually 1 is indeed non-prime, so the description is still aligned with the intended semantics. Thus semantic accuracy is very high. Completeness is slightly less than perfect because it doesn't mention the 1-handling explicitly or the use of sqrt optimization, but those are minor details relative to the problem statement.",
+      "new_problem_evaluation": "Ground truth new problem: find the first N non-prime numbers in a given range [start, end]; if fewer than N exist, return all non-primes found. The obfuscated new solution iterates from a1_jK4 to f6_nH3 (inclusive), calls g8_uZ2w(m5_rT8v), and appends numbers for which that function returns True, stopping when the list length reaches y4_dP7. Given the raw function is a non-prime test, g8_uZ2w is almost certainly that same non-prime predicate. So the code is collecting up to N non-prime numbers in the range. Qwen's inferred new description: \"The code finds a specified number of prime numbers within a given range and returns them in a list.\" This reverses the core predicate: it claims the function is collecting primes, not non-primes. That is a fundamental semantic error. Qwen does correctly recognize that (1) there is a range, (2) a specified number N is used as a limit, and (3) a list of numbers is returned, but it misidentifies the property being tested. It also fails to mention the behavior when there are fewer than N qualifying numbers; the code's early break and natural loop termination imply that it returns however many it found, but Qwen does not state this nuance. Therefore semantic accuracy is very low, and completeness is also poor because it misses both the non-prime vs prime distinction and the \"if less than N, return all found\" behavior.",
+      "transformation_analysis": "The transformation from raw to new ground truth is: from a single-number non-prime checker to a function that uses that checker to collect the first N non-prime numbers in a range [start, end], with a graceful fallback if fewer than N exist. Qwen understood the raw function as a non-prime checker, but then described the new function as collecting prime numbers, not non-primes. This indicates a failure to maintain the correct semantic link between the raw and new problems. It did understand that the new problem introduces a range and a count N and returns a list of numbers satisfying the predicate, but it mischaracterized the predicate itself and did not articulate the \"at most N\" / \"return all found if fewer\" behavior. As a result, its understanding of the raw→new transformation is essentially incorrect: it did not recognize that the new problem is a straightforward extension that reuses the same non-prime test over a range and aggregates results up to N.",
+      "obfuscation_handling": "The obfuscated names (x7z_9q, b3_kL8, g8_uZ2w, etc.) do not convey semantics, so understanding must come from control flow and operations. For the raw function, Qwen clearly relied on the loop structure and modulus checks to infer that the function tests for non-primality; this shows good robustness to obfuscation at the single-function level. However, for the new function, Qwen appears to have defaulted to a more generic assumption that such a predicate is a prime checker, not a non-prime checker, despite having already correctly identified the raw function as non-prime. It did correctly infer the range iteration, list accumulation, and early break when a count is reached, which again shows some structural understanding independent of names. But the critical inversion from non-prime to prime suggests that obfuscation (and perhaps lack of explicit linkage between g8_uZ2w and the earlier function) led to a semantic slip. Overall, Qwen handled the basic control-flow semantics reasonably but failed to propagate the correct predicate meaning across the obfuscated code.",
+      "strengths": [
+        "Accurately identified the raw function as a non-prime checker using divisor logic, despite obfuscated variable names.",
+        "Recognized the use of a range, accumulation into a list, and a count-based early termination in the new function.",
+        "Understood that the new function returns a specified number of qualifying numbers from a range."
+      ],
+      "weaknesses": [
+        "Misclassified the property tested in the new function, calling the collected numbers prime instead of non-prime.",
+        "Did not explicitly describe the behavior when fewer than N qualifying numbers exist in the range.",
+        "Failed to maintain the semantic link between the raw non-prime checker and its reuse in the new function.",
+        "Did not mention the inclusive nature of the [start, end] range or the fallback behavior in the new problem."
+      ],
+      "key_insights": "Qwen can accurately infer the semantics of a simple mathematical predicate (non-prime detection) from obfuscated code by analyzing control flow and arithmetic operations. However, when that predicate is reused in a higher-level aggregation function, Qwen is prone to defaulting to a more common pattern (prime collection) rather than carefully preserving the previously inferred semantics. This indicates that while local code understanding is strong, global consistency across related functions—especially under obfuscation and when function names give no hints—remains a challenge. The model also tends to capture the broad structural pattern (iterate over range, collect up to N results) but may omit or misstate key problem-specific nuances such as the exact property being tested and edge-case behavior when constraints are not fully met."
+    },
+    "computed_overall_score": 2.5
+  }
+}

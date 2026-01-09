@@ -1,0 +1,106 @@
+{
+  "problem_id": 291,
+  "source_files": {
+    "ground_truth": "mbpp_pro_incorrect_code/291.json",
+    "qwen_analysis": "qwen_incorrect_code_analysis/291.json",
+    "original_code": "../mbpp_pro/291.json"
+  },
+  "error_metadata": {
+    "error_type": "logical_error",
+    "error_description": "The raw solution has inverted conditional logic, filtering for odd numbers (num % 2 != 0) instead of even numbers (num % 2 == 0). This causes Split() to return odd numbers, which then propagates to the new solution making it sum odd numbers instead of even numbers.",
+    "where_error_is": "In the Split function's list comprehension condition, the modulo check is inverted from == 0 to != 0",
+    "expected_failure_cases": "Any test case with even numbers will fail. For example: Split([1,2,3,4]) would return [1,3] instead of [2,4]. SumOfEvens([[2,4,6],[8,10]]) would return 0 instead of 30. The error will be most obvious when lists contain both even and odd numbers, as the function will consistently return the wrong subset."
+  },
+  "validation_result": {
+    "skipped": false,
+    "passed": false,
+    "failure_type": "SyntaxError",
+    "failure_message": "'return' outside function (<string>, line 1)"
+  },
+  "qwen_analysis_summary": {
+    "raw_solution_correct": false,
+    "new_solution_correct": false,
+    "raw_errors_found": 1,
+    "new_errors_found": 2,
+    "raw_confidence": 1.0,
+    "new_confidence": 1.0,
+    "raw_matches_problem": false,
+    "new_matches_problem": false,
+    "raw_problem_alignment": "The code does not align with the problem description. It finds odd numbers instead of even numbers.",
+    "new_problem_alignment": "The code does not align with the problem description. It uses an undefined function `Split` and incorrectly sums odd numbers."
+  },
+  "judge_evaluation": {
+    "problem_id": 291,
+    "raw_solution_evaluation": {
+      "error_detection_accuracy": 5.0,
+      "error_location_precision": 5.0,
+      "error_type_classification": 5.0,
+      "error_explanation_quality": 5.0,
+      "completeness": 5.0,
+      "fix_suggestion_quality": 5.0,
+      "overall_score": 5.0,
+      "detailed_analysis": {
+        "correctly_detected": [
+          "Identified that the list comprehension condition `num % 2 != 0` selects odd numbers instead of even numbers, contradicting the problem requirement.",
+          "Recognized this as a logical error in the filtering condition."
+        ],
+        "missed_errors": [],
+        "false_positives": [],
+        "bucket_alignment": "Perfect alignment: Qwen labeled the issue as a logical_error, matching the ground truth.",
+        "location_accuracy": "Accurately pinpointed the error to the line with the list comprehension condition (`num % 2 != 0`). Since the raw solution is a one-liner, referring to it as line 2 is acceptable and unambiguous.",
+        "explanation_quality": "Explanation clearly states that the condition filters odd numbers, while the task is to find even numbers, and gives a concrete failing example ([1, 2, 3, 4] -> [1, 3] instead of [2, 4]). This directly matches the ground truth description.",
+        "strengths": [
+          "Correctly identified the core logical inversion (`!= 0` vs `== 0`).",
+          "Matched the error type bucket (logical_error) with the ground truth.",
+          "Provided a precise and minimal fix (`num % 2 == 0`).",
+          "Connected the error to expected failing behavior on example input."
+        ],
+        "weaknesses": [
+          "None relative to the ground truth; the analysis is fully aligned and complete for this simple case."
+        ]
+      }
+    },
+    "new_solution_evaluation": {
+      "error_detection_accuracy": 3.0,
+      "error_location_precision": 4.0,
+      "error_type_classification": 3.0,
+      "error_explanation_quality": 3.0,
+      "completeness": 2.0,
+      "fix_suggestion_quality": 3.0,
+      "overall_score": 3.0,
+      "detailed_analysis": {
+        "correctly_detected": [
+          "Recognized that, if `Split` is defined as in the raw solution, the new solution will sum odd numbers instead of even numbers, so the overall behavior is logically wrong with respect to the problem.",
+          "Connected the logical error in `Split` to incorrect summation in `SumOfEvens` (propagation of the raw solution’s bug)."
+        ],
+        "missed_errors": [
+          "Did not recognize that, given the problem context, `Split` is intended to be the helper function from the raw solution and is therefore not actually undefined in the combined setting.",
+          "Did not note that the new solution’s structure `sum(num for l in lists for num in Split(l))` is otherwise logically correct and that the only true ground-truth error is the logic inside `Split`."
+        ],
+        "false_positives": [
+          "Claimed an 'Undefined function `Split`' error and a resulting NameError, even though in the intended problem setup `Split` is defined in the raw solution and reused in the new solution."
+        ],
+        "bucket_alignment": "Partial alignment: The logical error in how `Split` behaves is correctly bucketed as logical_error and matches the ground truth. However, the additional 'type_error' bucket for an undefined function is a false positive and does not correspond to any ground-truth error.",
+        "location_accuracy": "Both reported issues are tied to 'Line 2 of New Solution', which is where `Split(l)` is called. This is a reasonable location for the propagated logical error. For the claimed undefined-function error, the location is also syntactically where the call occurs, but that error itself is spurious in the intended multi-function context.",
+        "explanation_quality": "The explanation of the logical propagation is good: Qwen correctly states that if `Split` filters odd numbers, `SumOfEvens` will sum odd numbers and fail the given test. However, the explanation about `Split` being undefined and causing a NameError is misleading in the context where the raw and new solutions are meant to coexist. This mixes a correct conceptual understanding (wrong numbers being summed) with an incorrect assumption about missing definitions.",
+        "strengths": [
+          "Correctly reasoned about how the bug in `Split` affects `SumOfEvens` and leads to summing odd instead of even numbers.",
+          "Correctly predicted that the provided test case would fail due to summing the wrong subset of numbers.",
+          "Suggested fixing the logic in `Split` or directly filtering even numbers in the summation, which conceptually addresses the real logical problem."
+        ],
+        "weaknesses": [
+          "Introduced a non-existent 'undefined function Split' error, which is a clear false positive relative to the ground truth.",
+          "Misclassified that false positive as a type_error, which does not match the ground truth error set.",
+          "Overstated the nature of the failure (NameError) instead of focusing solely on the logical mismatch that the ground truth describes.",
+          "Did not clearly distinguish between the helper function being defined elsewhere (raw solution) and the snippet-local view."
+        ]
+      }
+    },
+    "overall_performance": {
+      "overall_error_detection_performance": 4.0,
+      "summary": "Qwen perfectly analyzed the raw helper function, correctly identifying the inverted even/odd logic, classifying it as a logical error, and proposing an exact fix. For the new solution, it correctly understood that the same logical error propagates and causes incorrect sums, but it also introduced a spurious 'undefined function Split' error, reducing completeness and precision.",
+      "key_insights": "Qwen is strong at recognizing logical condition inversions and reasoning about how bugs propagate through composed functions. It provides clear explanations and concrete failing examples. However, it can over-interpret code snippets in isolation and infer additional errors (like undefined functions) that are not present in the intended multi-function context, leading to false positives and misaligned error-type buckets.",
+      "recommendations": "Improve context handling so that helper functions defined in the raw solution are assumed available to the new solution when that is the problem structure, avoiding false 'undefined' errors. Encourage the model to prioritize matching known ground-truth patterns (e.g., a single logical error in a helper) over inventing additional error types. When multiple functions are involved, explicitly reason about shared definitions before asserting NameErrors or undefined symbols. This would preserve Qwen’s strong logical reasoning while reducing false positives and misclassifications."
+    }
+  }
+}

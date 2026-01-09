@@ -1,0 +1,204 @@
+{
+  "problem_id": 278,
+  "source_file": "mbpp_pro_incorrect_code/278.json",
+  "analysis_timestamp": "2025-12-02T07:39:48.505393Z",
+  "model_used": "Qwen/Qwen2.5-Coder-32B-Instruct",
+  "prompt_used": [
+    {
+      "role": "system",
+      "content": "You are an expert Python code reviewer and bug detector. Your task is to analyze Python code and determine:\n\n1. Whether the code is CORRECT or INCORRECT\n2. If incorrect, identify all errors and their locations\n3. Explain what is wrong and why\n4. Describe the impact of each error\n5. Suggest how to fix the errors\n\nBe thorough and precise in your analysis. Focus on:\n- Logic errors (wrong algorithm, incorrect conditions)\n- Off-by-one errors and indexing mistakes\n- Edge case failures\n- Type/format errors\n- Missing validations\n- Boundary condition issues\n\nRespond in structured JSON format as specified."
+    },
+    {
+      "role": "user",
+      "content": "Analyze the following Python code and determine if it is correct or incorrect.\n\n**Problem Descriptions:**\n\nRaw Problem:\n# Write a function which given a matrix represented as a list of lists returns the max of the n'th column.\ndef max_of_nth(test_list, N):\n\n\nNew Problem:\n# Given a list of matrices represented as lists of lists, return a list of the maximum values of the n'th column for each matrix. If a matrix does not have an n'th column, return None for that matrix.\ndef max_of_nth_columns(matrices, N):\n\n\n**Code to Analyze:**\n\nRaw Solution:\n```python\nreturn sum([sub[N] for sub in test_list]) / len(test_list)\n```\n\nNew Solution:\n```python\nreturn [sum([row[N] for row in matrix]) / len(matrix) if len(matrix) > 0 and all(len(row) > N for row in matrix) else None for matrix in matrices]\n```\n\n**Test Cases (for reference):**\n```python\nassert max_of_nth_columns([[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11], [12, 13]]], 1) == [8, 13]\nassert max_of_nth_columns([[[1, 2], [3, 4]], [[5, 6, 7], [8, 9, 10]]], 2) == [None, None]\nassert max_of_nth_columns([[[1]], [[2, 3, 4], [5, 6, 7]]], 0) == [1, 5]\nassert max_of_nth_columns([[[1, 2, 3], [4, 5, 6]], [[7, 8], [9, 10]]], 2) == [None, None]\n```\n\n**Your Analysis Task:**\n\n1. Determine if each solution is CORRECT or INCORRECT\n2. For incorrect code, identify ALL errors:\n   - Exact location (function name, line description, variable names)\n   - Type of error (logical, off-by-one, edge case, etc.)\n   - What is wrong and why\n   - Which test cases or inputs would fail\n   - How to fix the error\n\n3. Be thorough - even subtle errors matter\n4. Consider edge cases and boundary conditions\n5. Check if the code matches the problem description\n\nRespond with a JSON object containing:\n {\n  \"raw_solution_analysis\": {\n    \"is_correct\": boolean,\n    \"errors_found\": integer (0 if correct),\n    \"confidence\": float (0.0-1.0 for this assessment),\n    \"matches_problem\": boolean (does the code solve the stated raw_problem?),\n    \"problem_alignment\": \"string (how well it aligns with raw_problem requirements)\",\n    \"test_alignment\": \"string (expected failing cases or why tests would fail)\",\n    \"errors\": [\n      {\n        \"location\": \"string (where in the code)\",\n        \"error_type\": \"string (free-form detail)\",\n        \"error_type_bucket\": \"string (one of: logical_error, off_by_one, edge_case_failure, algorithm_error, boundary_condition, type_error, missing_validation)\",\n        \"description\": \"string (what is wrong)\",\n        \"explanation\": \"string (why it's wrong and impact)\",\n        \"failing_cases\": \"string (what inputs/test cases would fail)\",\n        \"fix_suggestion\": \"string (how to fix it)\"\n      }\n    ],\n    \"overall_assessment\": \"string (summary of code correctness)\"\n  },\n  \"new_solution_analysis\": {\n    \"is_correct\": boolean,\n    \"errors_found\": integer (0 if correct),\n    \"confidence\": float (0.0-1.0),\n    \"matches_problem\": boolean (does the code solve the stated new_problem?),\n    \"problem_alignment\": \"string\",\n    \"test_alignment\": \"string\",\n    \"errors\": [\n      {\n        \"location\": \"string\",\n        \"error_type\": \"string\",\n        \"error_type_bucket\": \"string (one of: logical_error, off_by_one, edge_case_failure, algorithm_error, boundary_condition, type_error, missing_validation)\",\n        \"description\": \"string\",\n        \"explanation\": \"string\",\n        \"failing_cases\": \"string\",\n        \"fix_suggestion\": \"string\"\n      }\n    ],\n    \"overall_assessment\": \"string\"\n  },\n  \"comparison_note\": \"string (note on relationship between raw and new solution errors)\"\n}\n\nRespond with ONLY the JSON object, no markdown formatting or additional text."
+    }
+  ],
+  "incorrect_code_metadata": {
+    "error_type": "algorithm_error",
+    "error_description": "Uses average (mean) calculation instead of finding the maximum value. The algorithm computes the sum of all values in the n'th column divided by the number of rows, which gives the arithmetic mean rather than the maximum value.",
+    "where_error_is": "Both functions: raw_solution uses sum/len instead of max; new_solution applies the same incorrect averaging approach to each matrix"
+  },
+  "qwen_analysis": {
+    "parsed": {
+      "raw_solution_analysis": {
+        "is_correct": false,
+        "errors_found": 3,
+        "confidence": 1.0,
+        "matches_problem": false,
+        "problem_alignment": "The code does not align with the raw problem description. It calculates the average of the n'th column instead of finding the maximum.",
+        "test_alignment": "All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.",
+        "errors": [
+          {
+            "location": "return sum([sub[N] for sub in test_list]) / len(test_list)",
+            "error_type": "Incorrect operation",
+            "error_type_bucket": "algorithm_error",
+            "description": "The function calculates the average of the n'th column instead of finding the maximum.",
+            "explanation": "The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.",
+            "failing_cases": "Any input where the maximum value is not equal to the average of the column.",
+            "fix_suggestion": "Replace the return statement with `max(sub[N] for sub in test_list)`."
+          },
+          {
+            "location": "return sum([sub[N] for sub in test_list]) / len(test_list)",
+            "error_type": "Missing validation",
+            "error_type_bucket": "missing_validation",
+            "description": "The code does not check if the matrix has enough columns.",
+            "explanation": "If the matrix does not have an n'th column, accessing `sub[N]` will raise an IndexError.",
+            "failing_cases": "A matrix with fewer columns than N.",
+            "fix_suggestion": "Add a check to ensure all rows have at least N+1 columns before attempting to access them."
+          },
+          {
+            "location": "return sum([sub[N] for sub in test_list]) / len(test_list)",
+            "error_type": "Division by zero",
+            "error_type_bucket": "boundary_condition",
+            "description": "The code does not handle the case where the matrix is empty.",
+            "explanation": "If `test_list` is empty, `len(test_list)` is zero, leading to a division by zero error.",
+            "failing_cases": "An empty matrix.",
+            "fix_suggestion": "Check if `test_list` is empty before performing the division."
+          }
+        ],
+        "overall_assessment": "The code is incorrect due to multiple issues including calculating the average instead of the maximum, lack of validation for column existence, and potential division by zero."
+      },
+      "new_solution_analysis": {
+        "is_correct": false,
+        "errors_found": 3,
+        "confidence": 1.0,
+        "matches_problem": false,
+        "problem_alignment": "The code does not align with the new problem description. It calculates the average of the n'th column instead of finding the maximum.",
+        "test_alignment": "All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.",
+        "errors": [
+          {
+            "location": "sum([row[N] for row in matrix]) / len(matrix)",
+            "error_type": "Incorrect operation",
+            "error_type_bucket": "algorithm_error",
+            "description": "The function calculates the average of the n'th column instead of finding the maximum.",
+            "explanation": "The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.",
+            "failing_cases": "Any input where the maximum value is not equal to the average of the column.",
+            "fix_suggestion": "Replace the expression with `max(row[N] for row in matrix)`."
+          },
+          {
+            "location": "all(len(row) > N for row in matrix)",
+            "error_type": "Inefficient check",
+            "error_type_bucket": "performance",
+            "description": "The code checks the length of every row, which is unnecessary if the first row fails the check.",
+            "explanation": "Using `all()` will iterate over all rows even if the first one fails the condition, which is inefficient.",
+            "failing_cases": "N/A (not a correctness issue, but a performance concern).",
+            "fix_suggestion": "Use a generator expression with `next()` to stop checking after the first failure: `next((False for row in matrix if len(row) <= N), True)`."
+          },
+          {
+            "location": "sum([row[N] for row in matrix]) / len(matrix)",
+            "error_type": "Division by zero",
+            "error_type_bucket": "boundary_condition",
+            "description": "The code does not handle the case where the matrix is empty.",
+            "explanation": "If `matrix` is empty, `len(matrix)` is zero, leading to a division by zero error.",
+            "failing_cases": "An empty matrix.",
+            "fix_suggestion": "Check if `matrix` is empty before performing the division."
+          }
+        ],
+        "overall_assessment": "The code is incorrect due to multiple issues including calculating the average instead of the maximum, an inefficient check for column existence, and potential division by zero."
+      },
+      "comparison_note": "Both solutions contain similar errors, primarily calculating the average instead of the maximum and lacking proper validation for column existence and handling empty matrices. The new solution also includes an inefficient check for column existence."
+    },
+    "raw_response_text": "{\n  \"raw_solution_analysis\": {\n    \"is_correct\": false,\n    \"errors_found\": 3,\n    \"confidence\": 1.0,\n    \"matches_problem\": false,\n    \"problem_alignment\": \"The code does not align with the raw problem description. It calculates the average of the n'th column instead of finding the maximum.\",\n    \"test_alignment\": \"All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.\",\n    \"errors\": [\n      {\n        \"location\": \"return sum([sub[N] for sub in test_list]) / len(test_list)\",\n        \"error_type\": \"Incorrect operation\",\n        \"error_type_bucket\": \"algorithm_error\",\n        \"description\": \"The function calculates the average of the n'th column instead of finding the maximum.\",\n        \"explanation\": \"The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.\",\n        \"failing_cases\": \"Any input where the maximum value is not equal to the average of the column.\",\n        \"fix_suggestion\": \"Replace the return statement with `max(sub[N] for sub in test_list)`.\"\n      },\n      {\n        \"location\": \"return sum([sub[N] for sub in test_list]) / len(test_list)\",\n        \"error_type\": \"Missing validation\",\n        \"error_type_bucket\": \"missing_validation\",\n        \"description\": \"The code does not check if the matrix has enough columns.\",\n        \"explanation\": \"If the matrix does not have an n'th column, accessing `sub[N]` will raise an IndexError.\",\n        \"failing_cases\": \"A matrix with fewer columns than N.\",\n        \"fix_suggestion\": \"Add a check to ensure all rows have at least N+1 columns before attempting to access them.\"\n      },\n      {\n        \"location\": \"return sum([sub[N] for sub in test_list]) / len(test_list)\",\n        \"error_type\": \"Division by zero\",\n        \"error_type_bucket\": \"boundary_condition\",\n        \"description\": \"The code does not handle the case where the matrix is empty.\",\n        \"explanation\": \"If `test_list` is empty, `len(test_list)` is zero, leading to a division by zero error.\",\n        \"failing_cases\": \"An empty matrix.\",\n        \"fix_suggestion\": \"Check if `test_list` is empty before performing the division.\"\n      }\n    ],\n    \"overall_assessment\": \"The code is incorrect due to multiple issues including calculating the average instead of the maximum, lack of validation for column existence, and potential division by zero.\"\n  },\n  \"new_solution_analysis\": {\n    \"is_correct\": false,\n    \"errors_found\": 3,\n    \"confidence\": 1.0,\n    \"matches_problem\": false,\n    \"problem_alignment\": \"The code does not align with the new problem description. It calculates the average of the n'th column instead of finding the maximum.\",\n    \"test_alignment\": \"All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.\",\n    \"errors\": [\n      {\n        \"location\": \"sum([row[N] for row in matrix]) / len(matrix)\",\n        \"error_type\": \"Incorrect operation\",\n        \"error_type_bucket\": \"algorithm_error\",\n        \"description\": \"The function calculates the average of the n'th column instead of finding the maximum.\",\n        \"explanation\": \"The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.\",\n        \"failing_cases\": \"Any input where the maximum value is not equal to the average of the column.\",\n        \"fix_suggestion\": \"Replace the expression with `max(row[N] for row in matrix)`.\"\n      },\n      {\n        \"location\": \"all(len(row) > N for row in matrix)\",\n        \"error_type\": \"Inefficient check\",\n        \"error_type_bucket\": \"performance\",\n        \"description\": \"The code checks the length of every row, which is unnecessary if the first row fails the check.\",\n        \"explanation\": \"Using `all()` will iterate over all rows even if the first one fails the condition, which is inefficient.\",\n        \"failing_cases\": \"N/A (not a correctness issue, but a performance concern).\",\n        \"fix_suggestion\": \"Use a generator expression with `next()` to stop checking after the first failure: `next((False for row in matrix if len(row) <= N), True)`.\"\n      },\n      {\n        \"location\": \"sum([row[N] for row in matrix]) / len(matrix)\",\n        \"error_type\": \"Division by zero\",\n        \"error_type_bucket\": \"boundary_condition\",\n        \"description\": \"The code does not handle the case where the matrix is empty.\",\n        \"explanation\": \"If `matrix` is empty, `len(matrix)` is zero, leading to a division by zero error.\",\n        \"failing_cases\": \"An empty matrix.\",\n        \"fix_suggestion\": \"Check if `matrix` is empty before performing the division.\"\n      }\n    ],\n    \"overall_assessment\": \"The code is incorrect due to multiple issues including calculating the average instead of the maximum, an inefficient check for column existence, and potential division by zero.\"\n  },\n  \"comparison_note\": \"Both solutions contain similar errors, primarily calculating the average instead of the maximum and lacking proper validation for column existence and handling empty matrices. The new solution also includes an inefficient check for column existence.\"\n}"
+  },
+  "problem_descriptions": {
+    "raw_problem": "# Write a function which given a matrix represented as a list of lists returns the max of the n'th column.\ndef max_of_nth(test_list, N):\n",
+    "new_problem": "# Given a list of matrices represented as lists of lists, return a list of the maximum values of the n'th column for each matrix. If a matrix does not have an n'th column, return None for that matrix.\ndef max_of_nth_columns(matrices, N):\n"
+  },
+  "qwen_analysis_validated": {
+    "parsed": {
+      "raw_solution_analysis": {
+        "is_correct": false,
+        "errors_found": 3,
+        "confidence": 1.0,
+        "matches_problem": false,
+        "problem_alignment": "The code does not align with the raw problem description. It calculates the average of the n'th column instead of finding the maximum.",
+        "test_alignment": "All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.",
+        "errors": [
+          {
+            "location": "return sum([sub[N] for sub in test_list]) / len(test_list)",
+            "error_type": "Incorrect operation",
+            "error_type_bucket": "algorithm_error",
+            "description": "The function calculates the average of the n'th column instead of finding the maximum.",
+            "explanation": "The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.",
+            "failing_cases": "Any input where the maximum value is not equal to the average of the column.",
+            "fix_suggestion": "Replace the return statement with `max(sub[N] for sub in test_list)`."
+          },
+          {
+            "location": "return sum([sub[N] for sub in test_list]) / len(test_list)",
+            "error_type": "Missing validation",
+            "error_type_bucket": "missing_validation",
+            "description": "The code does not check if the matrix has enough columns.",
+            "explanation": "If the matrix does not have an n'th column, accessing `sub[N]` will raise an IndexError.",
+            "failing_cases": "A matrix with fewer columns than N.",
+            "fix_suggestion": "Add a check to ensure all rows have at least N+1 columns before attempting to access them."
+          },
+          {
+            "location": "return sum([sub[N] for sub in test_list]) / len(test_list)",
+            "error_type": "Division by zero",
+            "error_type_bucket": "boundary_condition",
+            "description": "The code does not handle the case where the matrix is empty.",
+            "explanation": "If `test_list` is empty, `len(test_list)` is zero, leading to a division by zero error.",
+            "failing_cases": "An empty matrix.",
+            "fix_suggestion": "Check if `test_list` is empty before performing the division."
+          }
+        ],
+        "overall_assessment": "The code is incorrect due to multiple issues including calculating the average instead of the maximum, lack of validation for column existence, and potential division by zero."
+      },
+      "new_solution_analysis": {
+        "is_correct": false,
+        "errors_found": 3,
+        "confidence": 1.0,
+        "matches_problem": false,
+        "problem_alignment": "The code does not align with the new problem description. It calculates the average of the n'th column instead of finding the maximum.",
+        "test_alignment": "All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.",
+        "errors": [
+          {
+            "location": "sum([row[N] for row in matrix]) / len(matrix)",
+            "error_type": "Incorrect operation",
+            "error_type_bucket": "algorithm_error",
+            "description": "The function calculates the average of the n'th column instead of finding the maximum.",
+            "explanation": "The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.",
+            "failing_cases": "Any input where the maximum value is not equal to the average of the column.",
+            "fix_suggestion": "Replace the expression with `max(row[N] for row in matrix)`."
+          },
+          {
+            "location": "all(len(row) > N for row in matrix)",
+            "error_type": "Inefficient check",
+            "error_type_bucket": "performance",
+            "description": "The code checks the length of every row, which is unnecessary if the first row fails the check.",
+            "explanation": "Using `all()` will iterate over all rows even if the first one fails the condition, which is inefficient.",
+            "failing_cases": "N/A (not a correctness issue, but a performance concern).",
+            "fix_suggestion": "Use a generator expression with `next()` to stop checking after the first failure: `next((False for row in matrix if len(row) <= N), True)`."
+          },
+          {
+            "location": "sum([row[N] for row in matrix]) / len(matrix)",
+            "error_type": "Division by zero",
+            "error_type_bucket": "boundary_condition",
+            "description": "The code does not handle the case where the matrix is empty.",
+            "explanation": "If `matrix` is empty, `len(matrix)` is zero, leading to a division by zero error.",
+            "failing_cases": "An empty matrix.",
+            "fix_suggestion": "Check if `matrix` is empty before performing the division."
+          }
+        ],
+        "overall_assessment": "The code is incorrect due to multiple issues including calculating the average instead of the maximum, an inefficient check for column existence, and potential division by zero."
+      },
+      "comparison_note": "Both solutions contain similar errors, primarily calculating the average instead of the maximum and lacking proper validation for column existence and handling empty matrices. The new solution also includes an inefficient check for column existence."
+    },
+    "validation": {
+      "raw_solution_validation": {
+        "missing_fields": [],
+        "errors_list_count": 3,
+        "bucket_issues": []
+      },
+      "new_solution_validation": {
+        "missing_fields": [],
+        "errors_list_count": 3,
+        "bucket_issues": [
+          "1: invalid bucket 'performance'"
+        ]
+      },
+      "has_missing_fields": false
+    },
+    "raw_response_text": "{\n  \"raw_solution_analysis\": {\n    \"is_correct\": false,\n    \"errors_found\": 3,\n    \"confidence\": 1.0,\n    \"matches_problem\": false,\n    \"problem_alignment\": \"The code does not align with the raw problem description. It calculates the average of the n'th column instead of finding the maximum.\",\n    \"test_alignment\": \"All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.\",\n    \"errors\": [\n      {\n        \"location\": \"return sum([sub[N] for sub in test_list]) / len(test_list)\",\n        \"error_type\": \"Incorrect operation\",\n        \"error_type_bucket\": \"algorithm_error\",\n        \"description\": \"The function calculates the average of the n'th column instead of finding the maximum.\",\n        \"explanation\": \"The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.\",\n        \"failing_cases\": \"Any input where the maximum value is not equal to the average of the column.\",\n        \"fix_suggestion\": \"Replace the return statement with `max(sub[N] for sub in test_list)`.\"\n      },\n      {\n        \"location\": \"return sum([sub[N] for sub in test_list]) / len(test_list)\",\n        \"error_type\": \"Missing validation\",\n        \"error_type_bucket\": \"missing_validation\",\n        \"description\": \"The code does not check if the matrix has enough columns.\",\n        \"explanation\": \"If the matrix does not have an n'th column, accessing `sub[N]` will raise an IndexError.\",\n        \"failing_cases\": \"A matrix with fewer columns than N.\",\n        \"fix_suggestion\": \"Add a check to ensure all rows have at least N+1 columns before attempting to access them.\"\n      },\n      {\n        \"location\": \"return sum([sub[N] for sub in test_list]) / len(test_list)\",\n        \"error_type\": \"Division by zero\",\n        \"error_type_bucket\": \"boundary_condition\",\n        \"description\": \"The code does not handle the case where the matrix is empty.\",\n        \"explanation\": \"If `test_list` is empty, `len(test_list)` is zero, leading to a division by zero error.\",\n        \"failing_cases\": \"An empty matrix.\",\n        \"fix_suggestion\": \"Check if `test_list` is empty before performing the division.\"\n      }\n    ],\n    \"overall_assessment\": \"The code is incorrect due to multiple issues including calculating the average instead of the maximum, lack of validation for column existence, and potential division by zero.\"\n  },\n  \"new_solution_analysis\": {\n    \"is_correct\": false,\n    \"errors_found\": 3,\n    \"confidence\": 1.0,\n    \"matches_problem\": false,\n    \"problem_alignment\": \"The code does not align with the new problem description. It calculates the average of the n'th column instead of finding the maximum.\",\n    \"test_alignment\": \"All test cases would fail because the function does not return the maximum value of the n'th column but rather its average.\",\n    \"errors\": [\n      {\n        \"location\": \"sum([row[N] for row in matrix]) / len(matrix)\",\n        \"error_type\": \"Incorrect operation\",\n        \"error_type_bucket\": \"algorithm_error\",\n        \"description\": \"The function calculates the average of the n'th column instead of finding the maximum.\",\n        \"explanation\": \"The problem requires finding the maximum value, but the code sums the elements and divides by the number of rows, which calculates the average.\",\n        \"failing_cases\": \"Any input where the maximum value is not equal to the average of the column.\",\n        \"fix_suggestion\": \"Replace the expression with `max(row[N] for row in matrix)`.\"\n      },\n      {\n        \"location\": \"all(len(row) > N for row in matrix)\",\n        \"error_type\": \"Inefficient check\",\n        \"error_type_bucket\": \"performance\",\n        \"description\": \"The code checks the length of every row, which is unnecessary if the first row fails the check.\",\n        \"explanation\": \"Using `all()` will iterate over all rows even if the first one fails the condition, which is inefficient.\",\n        \"failing_cases\": \"N/A (not a correctness issue, but a performance concern).\",\n        \"fix_suggestion\": \"Use a generator expression with `next()` to stop checking after the first failure: `next((False for row in matrix if len(row) <= N), True)`.\"\n      },\n      {\n        \"location\": \"sum([row[N] for row in matrix]) / len(matrix)\",\n        \"error_type\": \"Division by zero\",\n        \"error_type_bucket\": \"boundary_condition\",\n        \"description\": \"The code does not handle the case where the matrix is empty.\",\n        \"explanation\": \"If `matrix` is empty, `len(matrix)` is zero, leading to a division by zero error.\",\n        \"failing_cases\": \"An empty matrix.\",\n        \"fix_suggestion\": \"Check if `matrix` is empty before performing the division.\"\n      }\n    ],\n    \"overall_assessment\": \"The code is incorrect due to multiple issues including calculating the average instead of the maximum, an inefficient check for column existence, and potential division by zero.\"\n  },\n  \"comparison_note\": \"Both solutions contain similar errors, primarily calculating the average instead of the maximum and lacking proper validation for column existence and handling empty matrices. The new solution also includes an inefficient check for column existence.\"\n}"
+  }
+}

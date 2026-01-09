@@ -1,0 +1,122 @@
+{
+  "problem_id": 336,
+  "source_files": {
+    "ground_truth": "mbpp_pro_incorrect_code/336.json",
+    "qwen_analysis": "qwen_incorrect_code_analysis/336.json",
+    "original_code": "../mbpp_pro/336.json"
+  },
+  "error_metadata": {
+    "error_type": "logical_error",
+    "error_description": "The regex pattern for decimal validation has been changed from requiring a decimal point (\\.?) to making it optional (\\\\.?), which causes the pattern to accept integers without decimal points and also accept numbers with 1-2 digits after an optional decimal point. This breaks the requirement of validating decimal numbers with precision of 2, as it will now accept '123' as valid when it should only accept formats like '123.45' or '123.5'.",
+    "where_error_is": "is_decimal function, in the regex pattern compilation line where the decimal point matching group has been modified from (\\.?[0-9]{1,2})? to (\\\\.?[0-9]{1,2})",
+    "expected_failure_cases": "The code will incorrectly validate inputs like: '123' (integer without decimal), '12345' (multi-digit integer), or any integer as valid decimal numbers with precision 2. It should fail validation for these cases but will pass them as valid. However, it will still correctly validate actual decimal numbers like '123.45' and '99.9', making the bug subtle."
+  },
+  "validation_result": {
+    "skipped": false,
+    "passed": false,
+    "failure_type": "IndentationError",
+    "failure_message": "unexpected indent (<string>, line 2)"
+  },
+  "qwen_analysis_summary": {
+    "raw_solution_correct": false,
+    "new_solution_correct": false,
+    "raw_errors_found": 2,
+    "new_errors_found": 3,
+    "raw_confidence": 0.95,
+    "new_confidence": 0.95,
+    "raw_matches_problem": false,
+    "new_matches_problem": false,
+    "raw_problem_alignment": "The code attempts to solve the raw problem but has issues with regex and indentation.",
+    "new_problem_alignment": "The code attempts to solve the new problem but has issues with regex patterns and indentation."
+  },
+  "judge_evaluation": {
+    "problem_id": 336,
+    "raw_solution_evaluation": {
+      "error_detection_accuracy": 5.0,
+      "error_location_precision": 4.0,
+      "error_type_classification": 3.0,
+      "error_explanation_quality": 3.0,
+      "completeness": 2.0,
+      "fix_suggestion_quality": 2.0,
+      "overall_score": 3.1666666666666665,
+      "detailed_analysis": {
+        "correctly_detected": [
+          "Recognized that the solution is incorrect overall.",
+          "Identified that the regex change in is_decimal is problematic and alters which strings are accepted.",
+          "Noted indentation/syntax issues in the raw solution snippet (there is indeed bad leading indentation in the provided code)."
+        ],
+        "missed_errors": [
+          "Did not align with the ground truth requirement that the function should accept decimals with precision of 2 (or 1–2) and that integers like '123' should not be accepted; instead, Qwen assumed a stricter 'exactly two digits after decimal if present' requirement, which is not what the original correct code does.",
+          "Did not explicitly recognize that the core logical error is making the decimal point itself optional (so integers are now accepted) and removing the outer optional group, changing the semantics from 'optional decimal part' to 'mandatory group with optional dot'."
+        ],
+        "false_positives": [
+          "Claimed that the regex should enforce exactly two decimal places and that '123.4' should be invalid, which contradicts the original correct solution and the problem description as given.",
+          "Suggested that numbers like '123.' would be incorrectly matched as True by the incorrect regex; in fact, '123.' does not match the incorrect pattern r'^[0-9]+(\\.?[0-9]{1,2})$' because at least one digit after the optional dot is required."
+        ],
+        "bucket_alignment": "Partially aligned. Ground truth labels this as a logical_error in the regex; Qwen labels it as an algorithm_error. Both are in the same broad family (logic/algorithm), but Qwen’s interpretation of the logic is off and it adds a separate syntax_error for indentation that is not the primary ground-truth concern.",
+        "location_accuracy": "Qwen correctly localizes the main issue to the regex pattern line in is_decimal. It also points to indentation at the beginning of the function, which is indeed malformed in the snippet, though the ground truth focuses on logical behavior rather than syntax. Line numbers are approximate but the location (regex line) is clear.",
+        "explanation_quality": "The explanation correctly notes that the regex allows numbers without a decimal point and up to two decimal places. However, it misstates the intended behavior (insisting on exactly two decimal places) and incorrectly lists '123.4' as a failing case. It also incorrectly claims '123.' would be matched. So the explanation is partially helpful but contains technical inaccuracies and misalignment with the actual spec.",
+        "strengths": [
+          "Correctly flags that the solution is not correct.",
+          "Identifies the regex line as the source of the logical problem.",
+          "Understands that the pattern now accepts integers without a decimal point, which is indeed the core ground-truth bug.",
+          "Notices indentation/syntax issues present in the raw snippet."
+        ],
+        "weaknesses": [
+          "Misinterprets the intended specification for decimal precision (treats it as exactly two digits after the decimal, whereas the original correct code allows 1–2).",
+          "Provides incorrect examples of failing cases ('123.', '123.4') and mischaracterizes what the regex actually matches.",
+          "Fix suggestion changes the behavior away from the original correct solution (overly strict), so it does not restore the intended semantics.",
+          "Conflates real logical bug with additional stylistic/formatting issues without distinguishing which are ground-truth critical vs incidental."
+        ]
+      }
+    },
+    "new_solution_evaluation": {
+      "error_detection_accuracy": 4.0,
+      "error_location_precision": 4.0,
+      "error_type_classification": 2.0,
+      "error_explanation_quality": 2.0,
+      "completeness": 1.0,
+      "fix_suggestion_quality": 2.0,
+      "overall_score": 2.5,
+      "detailed_analysis": {
+        "correctly_detected": [
+          "Recognized that the new solution is incorrect overall.",
+          "Correctly localized the decimal-related bug to the regex pattern in is_decimal.",
+          "Noted indentation problems in the provided new solution snippet (functions and body are misindented)."
+        ],
+        "missed_errors": [
+          "Did not focus on the specific ground-truth logical change: making the decimal point optional and removing the outer optional group, which causes integers like '123' to be accepted as valid decimals.",
+          "Did not connect its analysis to the actual test expectations for validate_list (e.g., that '123' should be True in the new problem context because the new problem allows decimals OR emails, but the underlying is_decimal semantics are still supposed to be as in the original).",
+          "Did not notice that validate_list itself is missing as a function definition in the new incorrect code; the code only shows helper functions and list-processing logic at top level, which would break the tests."
+        ],
+        "false_positives": [
+          "Claims that the email regex is too permissive and suggests changing it, even though the email regex in the incorrect code is identical to the correct solution and passes the given tests.",
+          "Asserts that 'user@domain' would be matched by the current email regex; in fact, it is correctly rejected by the given pattern (no dot in the domain), and the tests rely on this behavior.",
+          "Treats the email regex as an error despite no ground-truth modification or test failure related to it.",
+          "Again claims that '123.', '123', and '123.4' are problematic in ways that do not match the actual behavior or the ground-truth description."
+        ],
+        "bucket_alignment": "Poor. Ground truth: a single logical_error in the is_decimal regex. Qwen: algorithm_error for is_decimal regex (reasonable bucket), algorithm_error for email regex (false positive), and syntax_error for indentation (not the primary ground-truth concern). Overall, the dominant ground-truth logical_error is mixed with extra, incorrect error types.",
+        "location_accuracy": "For the real bug, Qwen correctly points to the is_decimal regex line. It also generically points to indentation at the beginning of both functions, which matches the malformed snippet but is not the key logical issue. It incorrectly flags the email regex line as erroneous, which is a location false positive.",
+        "explanation_quality": "The explanation of the decimal regex repeats the same issues as in the raw solution: it notes that integers are allowed but then insists on enforcing exactly two decimal digits, diverging from the original correct behavior. For the email regex, the explanation is largely speculative and contradicts the given tests and correct solution. Overall, explanations are partially insightful about patterns but not well aligned with the actual spec or ground truth.",
+        "strengths": [
+          "Correctly identifies that the new solution is not correct.",
+          "Correctly associates the main numeric-validation issue with the is_decimal regex.",
+          "Recognizes that indentation in the provided snippet would cause syntax problems."
+        ],
+        "weaknesses": [
+          "Introduces a major false positive by criticizing the email regex, which is unchanged from the correct solution and passes tests.",
+          "Misunderstands the intended decimal precision semantics and proposes an over-strict pattern.",
+          "Does not mention the structural issue that validate_list is not actually defined as a function in the incorrect snippet (logic is at top level).",
+          "Provides failing-case examples and behavioral claims that do not match the actual regex behavior or the ground-truth description.",
+          "Error_type_bucket usage is noisy: mixes real logical bug with speculative algorithm_error on email and syntax_error, obscuring the primary issue."
+        ]
+      }
+    },
+    "overall_performance": {
+      "overall_error_detection_performance": 2.833333333333333,
+      "summary": "Qwen reliably detects that both the raw and new solutions are incorrect and correctly localizes the main issue to the is_decimal regex. However, it misinterprets the intended decimal precision semantics, adds speculative and incorrect criticisms of the email regex, and provides fixes that do not restore the original correct behavior. It also overemphasizes indentation/syntax issues relative to the ground-truth logical bug.",
+      "key_insights": "Qwen is strong at spotting that a regex change alters accepted inputs and at pointing to the right line of code. Its weakness lies in accurately reconstructing the intended specification from context and tests; it tends to impose its own stricter or different rules (e.g., exactly two decimal places) and to overgeneralize by flagging patterns (like the email regex) that are actually correct in this context. It also sometimes mischaracterizes what a given regex will match, leading to incorrect failing-case examples.",
+      "recommendations": "To improve, Qwen should: (1) ground its interpretation of the intended behavior more carefully in the original correct code and tests, rather than imposing a generic notion of 'decimal with precision 2'; (2) avoid speculative changes to components (like the email regex) that are unchanged from the correct solution and not implicated by tests; (3) reason more precisely about regex behavior before listing failing examples; and (4) distinguish between incidental formatting/indentation issues and the primary logical error emphasized in the ground truth."
+    }
+  }
+}

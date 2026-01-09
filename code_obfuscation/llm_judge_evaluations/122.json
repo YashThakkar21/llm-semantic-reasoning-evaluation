@@ -1,0 +1,46 @@
+{
+  "problem_id": 122,
+  "source_files": {
+    "ground_truth": "mbpp_pro/122.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/122.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/122.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to maximize the given two tuples.",
+    "new_problem": "# Given a list of tuples, each containing two tuples, write a function to maximize each pair of tuples within each tuple in the list. The function should return a list of tuples where each tuple contains the maximized elements from the corresponding pair of tuples in the input list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet takes two lists of tuples, b4h_t8r1 and f6n_v5l2, and returns a new tuple where each element is the maximum of the corresponding elements from the input tuples.",
+    "new_problem": "The code snippet iterates over a list of pairs m7n_p4t_s, applies a function t2h_f9l to each pair, collects the results in a list q9w_z, and returns this list."
+  },
+  "judge_evaluation": {
+    "problem_id": 122,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.33,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: maximize the given two tuples (element-wise max between two tuples). The obfuscated raw solution, however, actually takes two *iterables* of 2‑tuples (b4h_t8r1 and f6n_v5l2), zips them, and for each pair of 2‑tuples computes (max(x7z, w9q), max(k3m, p2j)), then wraps the generator in tuple(...). So the function returns a tuple of 2‑tuples, each being the element‑wise max of the corresponding pair of 2‑tuples from the two input sequences.\n\nQwen's description: \"takes two lists of tuples, b4h_t8r1 and f6n_v5l2, and returns a new tuple where each element is the maximum of the corresponding elements from the input tuples.\" This misses the nested structure: it sounds like it's taking two flat tuples/lists and returning a single flat tuple of element‑wise maxima, rather than a tuple of 2‑tuples produced by zipping two sequences of 2‑tuples. It also doesn't mention the per‑pair structure or that each input element is itself a 2‑tuple. So it partially captures the idea of taking maxima of corresponding elements, but not the correct level of nesting or the exact input/output structure.\n\nHence, semantic accuracy is low (it gets the 'max of corresponding elements' idea but not the true data shape), and completeness is also low because it omits the fact that each element of the inputs is a pair and that the result is a sequence of such pairs.",
+      "new_problem_evaluation": "Ground truth new problem: Given a list of tuples, each containing two tuples, write a function to maximize each pair of tuples within each tuple in the list, returning a list of tuples with the maximized elements. So the transformation is: instead of taking two separate collections of tuples, we now take a single list where each item is (tuple1, tuple2), and we apply the same element‑wise max logic to each pair, returning a list of resulting tuples.\n\nThe obfuscated new solution: it iterates over m7n_p4t_s, where each element is unpacked as r3x_8, y5k_2 (a pair), calls t2h_f9l(r3x_8, y5k_2), appends the result to q9w_z, and returns q9w_z. Given the ground truth, t2h_f9l is clearly the 'maximize two tuples' helper.\n\nQwen's new description: \"iterates over a list of pairs m7n_p4t_s, applies a function t2h_f9l to each pair, collects the results in a list q9w_z, and returns this list.\" This is structurally accurate: it correctly identifies that the input is a list of pairs, that a function is applied to each pair, and that the results are collected and returned. However, it does not state what t2h_f9l does (i.e., that it maximizes two tuples element‑wise). So semantically it's partially correct (control flow and data structure) but misses the core semantic of 'maximizing tuples'. Completeness is therefore limited: it captures the iteration and mapping pattern but not the problem's core operation.",
+      "transformation_analysis": "The raw→new transformation in the ground truth is: move from a function that maximizes two tuples (or two sequences of tuples) to a function that, given a list of such pairs, applies that maximizing operation to each pair and returns a list of results. Conceptually, it's lifting a binary operation on tuples to operate over a list of tuple‑pairs.\n\nQwen's raw problem inference mischaracterizes the raw function as operating on two lists of tuples and returning a single tuple of maxima, without clearly recognizing the nested 2‑tuple structure. In the new problem inference, Qwen correctly recognizes that the new function iterates over a list of pairs and applies some function to each pair, returning a list. However, it does not connect this back to the original 'maximize tuples' semantics; t2h_f9l is treated as a black box.\n\nThus, Qwen partially understands the structural transformation (from direct operation to mapping over a list of pairs) but not the semantic continuity (that the same 'maximize two tuples' logic is being reused). This yields a low‑to‑moderate score for transformation understanding.",
+      "obfuscation_handling": "Despite obfuscated names, Qwen correctly inferred several structural aspects:\n- For the raw code, it recognized that b4h_t8r1 and f6n_v5l2 are collections of tuples and that max is applied to corresponding elements.\n- For the new code, it correctly identified m7n_p4t_s as a list of pairs, the loop structure, the application of t2h_f9l to each pair, and accumulation into q9w_z.\n\nHowever, Qwen did not fully infer the precise data shapes (tuple of 2‑tuples vs flat tuple) and did not infer the semantic role of t2h_f9l as the 'maximize two tuples' helper. It relied mainly on surface structure (loop, append, function call) rather than deeper semantic inference about what the helper function must be doing given the context and the original problem. So robustness to obfuscation is moderate: it handled control flow and container structure well but missed some key semantic details.",
+      "strengths": [
+        "Identified that the raw code computes maxima of corresponding elements using max.",
+        "Recognized that the raw inputs are collections (lists) of tuples rather than single scalar values.",
+        "Correctly described the new code’s control flow: iterating over a list of pairs, applying a function to each, and collecting results.",
+        "Handled obfuscated variable names well enough to reconstruct the high-level iteration and mapping pattern."
+      ],
+      "weaknesses": [
+        "Mischaracterized the exact input/output structure of the raw function, missing that each element is a 2-tuple and that the result is a tuple of 2-tuples.",
+        "Did not explicitly state that the core operation is element-wise maximization of two tuples in either the raw or new problem descriptions.",
+        "Failed to connect the helper function t2h_f9l in the new solution to the original 'maximize two tuples' logic, treating it as an opaque operation.",
+        "Transformation understanding is incomplete: it captured the mapping pattern but not the semantic continuity of the operation across raw and new problems."
+      ],
+      "key_insights": "Qwen shows that it can reliably recover structural patterns (zipping, looping, mapping, collecting into a list/tuple) even when variable names are heavily obfuscated. It also recognizes the use of max on corresponding elements, indicating some semantic understanding. However, it struggles with precise data-shape reasoning (nested tuples vs flat tuples) and with inferring the semantics of helper functions from context. This leads to partial but not fully accurate problem descriptions, especially regarding the core operation (element-wise tuple maximization) and the exact input/output types. The model appears more comfortable describing control flow and container transformations than articulating the full semantic intent of the code under obfuscation."
+    },
+    "computed_overall_score": 2.3333333333333335
+  }
+}

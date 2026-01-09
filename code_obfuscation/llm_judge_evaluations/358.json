@@ -1,0 +1,48 @@
+{
+  "problem_id": 358,
+  "source_files": {
+    "ground_truth": "mbpp_pro/358.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/358.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/358.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function that matches a string that has an a followed by three 'b'.\nimport re",
+    "new_problem": "# Write a function that takes a list of strings and returns a list of strings that match the pattern of having an 'a' followed by three 'b's, but only if the string also contains at least one 'c' before the pattern. The function should process each string in the list and return a new list with the matching strings.\nimport re"
+  },
+  "qwen_inference": {
+    "raw_problem": "The raw solution checks if a given text contains the pattern 'ab' followed by exactly three of any character, using a non-greedy match.",
+    "new_problem": "The new solution filters a list of texts to find those that contain both the pattern 'ab' followed by exactly three of any character (non-greedy) and the character 'c'."
+  },
+  "judge_evaluation": {
+    "problem_id": 358,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 3.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 2.83,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: match a string that has an 'a' followed by three 'b's (regex 'ab{3}'). Qwen: \"pattern 'ab' followed by exactly three of any character, using a non-greedy match.\" The code actually uses the literal pattern 'ab{3}?', which in regex means 'a' followed by exactly three 'b' characters, with a non-greedy quantifier on the 'b'. Qwen misinterprets '{3}' as applying to any character after 'ab' rather than specifically to 'b'. It also describes the pattern as 'ab' + 3 arbitrary characters, which is semantically wrong. It does correctly understand that the function checks for a pattern in a given text, but the core semantics of the pattern are incorrect and the non-greedy aspect is overemphasized relative to the original problem statement. Thus, semantic accuracy and completeness are both low.",
+      "new_problem_evaluation": "Ground truth: function takes a list of strings and returns those that (1) match 'a' followed by three 'b's, and (2) contain at least one 'c' before that pattern. Qwen: \"filters a list of texts to find those that contain both the pattern 'ab' followed by exactly three of any character (non-greedy) and the character 'c'.\" From the obfuscated code, the actual behavior is: filter list to those strings where re.search('ab{3}?', text) is true and 'c' in text is true. There is no requirement that 'c' appears before the pattern; it's just anywhere in the string. Qwen correctly captures: (a) it processes a list of texts, (b) it filters based on the regex and presence of 'c'. It again misinterprets the regex as 'ab' + three arbitrary characters instead of 'a' + three 'b's, and it does not mention any ordering between 'c' and the pattern (which matches the actual code but diverges from the ground truth problem). So Qwen is semantically accurate with respect to the code structure (list filtering, conjunction of two conditions) but inaccurate about the exact regex semantics and misses the 'c before pattern' nuance from the ground truth. Hence medium scores for semantic accuracy and completeness.",
+      "transformation_analysis": "Ground truth transformation: from a single-string regex match ('a' followed by three 'b's) to a list-processing function that returns only those strings that both (1) match that pattern and (2) contain at least one 'c' before the pattern. Qwen's transformation description: from checking a pattern in a single text to filtering a list of texts for those that contain that pattern and also contain 'c'. Qwen correctly identifies the structural evolution: single-text check → list filtering; and single condition → conjunction of regex condition and 'c' presence. However, it consistently misinterprets the regex semantics in both raw and new problems, and it does not capture any ordering relationship between 'c' and the pattern (which is present in the ground truth but not in the given obfuscated code). In terms of understanding how the new solution builds on the raw one as seen in the code, Qwen does reasonably well: it understands that the new function reuses the pattern check and adds an extra character-presence condition over a list. So the transformation understanding is moderate: good on structural evolution, flawed on detailed semantics of the pattern and the intended ordering constraint.",
+      "obfuscation_handling": "The obfuscation here is mostly in variable/function names (e.g., a8_f9x2q, z7_k3m8w, t3xt_9z, t3xts_ql), while the core regex and logic remain clear. Qwen correctly ignores misleading names and infers the high-level behavior: a helper that checks a regex, another that checks for 'c', and a list comprehension that filters texts based on both. This shows good robustness to naming obfuscation and good use of structural cues (re.search, 'in', list comprehension). The main errors are not due to obfuscation but to misunderstanding the regex 'ab{3}?': it treats it as 'ab' followed by three arbitrary characters instead of 'a' followed by three 'b's, and it overemphasizes the 'non-greedy' aspect. That indicates a weakness in regex semantics rather than in handling obfuscated code. Overall, its structural understanding under obfuscation is strong, but its detailed semantic understanding of the pattern is weak.",
+      "strengths": [
+        "Correctly identifies that the raw solution checks for a regex pattern in a given text.",
+        "Correctly recognizes that the new solution operates on a list of texts and filters them.",
+        "Accurately captures that the new solution combines two conditions: a regex match and the presence of 'c' in the string.",
+        "Shows good resilience to obfuscated variable and function names, relying on code structure and library calls instead.",
+        "Understands the structural transformation from a single-string checker to a list filter that reuses the original check."
+      ],
+      "weaknesses": [
+        "Misinterprets the regex 'ab{3}?' as 'ab' followed by three arbitrary characters instead of 'a' followed by three 'b's.",
+        "Overemphasizes the 'non-greedy' aspect of the regex, which is not central to the problem description.",
+        "Does not capture the ground truth nuance that 'c' must appear before the pattern in the new problem (though this nuance is also absent from the provided obfuscated code).",
+        "Fails to clearly state that the pattern is specifically 'a' followed by exactly three 'b's, which is the core of the original problem.",
+        "Descriptions are slightly imprecise in pattern semantics, which affects both semantic accuracy and completeness."
+      ],
+      "key_insights": "Qwen demonstrates that it can robustly infer the high-level structure and flow of obfuscated Python code: it correctly identifies helper functions, their purposes, and how they are composed in a list comprehension. The main failure mode here is not about obfuscation but about fine-grained regex semantics: it misreads 'ab{3}?' and propagates that misunderstanding across both the raw and new problem descriptions. This suggests that while Qwen is strong at structural code understanding and transformation reasoning (single input → list processing, adding conditions), it may be less reliable on detailed interpretation of compact, symbolic patterns like regular expressions, especially when subtle quantifier behavior is involved."
+    },
+    "computed_overall_score": 2.8333333333333335
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "problem_id": 70,
+  "source_files": {
+    "ground_truth": "mbpp_pro/70.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/70.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/70.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find the maximum difference between the number of 0s and number of 1s in any sub-string of the given binary string.",
+    "new_problem": "# Given a list of binary strings, find the maximum difference between the number of 0s and number of 1s in any sub-string across all strings. You need to consider all possible sub-strings from the concatenation of all binary strings in the list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates the maximum length of a contiguous subsequence in a given string where the number of '0's is greater than or equal to the number of '1's.",
+    "new_problem": "The code concatenates multiple binary strings into one and then calculates the maximum length of a contiguous subsequence where the number of '0's is greater than or equal to the number of '1's using a helper function `find_length`."
+  },
+  "judge_evaluation": {
+    "problem_id": 70,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 4.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.0,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: compute the maximum difference (#0s - #1s) over all substrings of a binary string. The code does this via a Kadane-like scan: treat '0' as +1 and '1' as -1, reset the running sum to 0 when it becomes negative, and track the maximum sum. That maximum sum is exactly the maximum difference between 0s and 1s over all substrings.\n\nQwen's description: \"maximum length of a contiguous subsequence ... where the number of '0's is greater than or equal to the number of '1's.\" This is semantically different. The algorithm is not measuring length; it's measuring the net excess of 0s over 1s. Two substrings of the same length can have different (#0s - #1s), and the code prefers the one with larger difference, not longer length. Also, the condition is not just 0s ≥ 1s; the algorithm can pick substrings where 0s > 1s by as large a margin as possible. Qwen did correctly identify that the code is about contiguous subsequences and comparing counts of 0s and 1s, but it misinterpreted the key quantity being maximized.\n\nBecause of this, semantic accuracy and completeness are both low: the core purpose (max difference) is replaced with a different objective (max length under a constraint).",
+      "new_problem_evaluation": "Ground truth new problem: concatenate all binary strings, then find the maximum difference between #0s and #1s over all substrings of the concatenated string.\n\nQwen's new description: \"concatenates multiple binary strings into one and then calculates the maximum length of a contiguous subsequence where the number of '0's is greater than or equal to the number of '1's using a helper function `find_length`.\" Qwen correctly understood the structural transformation: join the list of strings into one and reuse the helper. It also correctly recognized that the same metric computed in the raw problem is applied to the concatenated string.\n\nHowever, it carries over the same semantic error: it still thinks the helper computes a maximum length under a 0s ≥ 1s constraint, rather than maximum (#0s - #1s). So while the high-level flow (concatenate → call helper on result) is right, the core semantic of what is being maximized remains wrong. This yields moderate semantic accuracy and completeness: the multi-string aspect and concatenation are captured, but the key metric is misdescribed.",
+      "transformation_analysis": "The transformation from raw to new problem is: (1) generalize from a single binary string to a list of binary strings, (2) conceptually consider all substrings of the concatenation, and (3) apply the same core computation (max difference) to that concatenated string.\n\nQwen correctly understood the structural relationship: it explicitly notes that multiple binary strings are concatenated into one and that the same helper function is used. This shows it grasped the raw→new evolution at the code level. The only issue is that its misunderstanding of the raw metric propagates to the new problem. Still, in terms of understanding the *relationship* between raw and new (\"do the same thing, but after concatenation\"), Qwen did well. Hence a relatively high score for transformation understanding despite the shared semantic error.",
+      "obfuscation_handling": "The code is obfuscated only in variable names; the control flow and operations are straightforward. Qwen correctly inferred that:\n- The loop processes a string character by character.\n- '0' contributes positively and '1' negatively to a running accumulator.\n- The accumulator is reset to 0 when negative (Kadane-like behavior).\n- A maximum over this running value is tracked and returned.\n- In the new solution, a list of binary strings is joined into one string, and the helper is applied.\n\nThese are all derived from structure and operations, not from names like `a9z_3q` or `w7_m2x`. The main error is conceptual: interpreting the accumulator as a length rather than a score/difference. That mistake is not due to obfuscation of names but to misinterpreting the algorithmic intent. Thus, robustness to obfuscation is fairly strong: Qwen was not misled by the names and correctly followed the logic, but it mis-labeled the meaning of the computed quantity.",
+      "strengths": [
+        "Correctly recognized that the function operates on contiguous substrings (subsequences) of a binary string.",
+        "Identified that '0' and '1' are treated differently and that the algorithm compares their counts in some way.",
+        "Noted the Kadane-like pattern: maintaining a running value, resetting when negative, and tracking a maximum.",
+        "For the new problem, correctly understood that multiple binary strings are concatenated and the same helper is reused.",
+        "Showed good resilience to obfuscated variable names by relying on control flow and operations."
+      ],
+      "weaknesses": [
+        "Misinterpreted the quantity being maximized as substring length instead of (#0s - #1s) difference.",
+        "Framed the condition as \"0s greater than or equal to 1s\" rather than maximizing the margin between them.",
+        "Did not explicitly mention that the returned value is a difference in counts, not a length or index.",
+        "Propagated the same semantic misunderstanding from the raw problem to the new problem."
+      ],
+      "key_insights": "Qwen demonstrated that it can follow obfuscated code structurally: it correctly recognized the loop pattern, the reset-on-negative behavior, and the reuse of a helper on a concatenated string. This indicates it is not overly dependent on variable names. However, it struggled to infer the precise *semantic* intent of the accumulator and maximum: it mapped a Kadane-style maximum-sum pattern to a maximum-length-under-constraint problem. This suggests that while Qwen can often recognize algorithmic templates, it may sometimes assign an incorrect high-level interpretation to them, especially when the code computes an abstract score (like #0s - #1s) rather than something directly observable like length or index."
+    },
+    "computed_overall_score": 3.0
+  }
+}

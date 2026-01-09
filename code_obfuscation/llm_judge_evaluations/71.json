@@ -1,0 +1,45 @@
+{
+  "problem_id": 71,
+  "source_files": {
+    "ground_truth": "mbpp_pro/71.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/71.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/71.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a python function to find the sum of common divisors of two given numbers.\nimport math",
+    "new_problem": "# Given a list of pairs of numbers, write a Python function to find the sum of the sums of common divisors for each pair in the list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates the sum of all divisors of the greatest common divisor (GCD) of two numbers, a and b.",
+    "new_problem": "The code calculates the sum of sums of pairs of numbers provided in a list called pairs."
+  },
+  "judge_evaluation": {
+    "problem_id": 71,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 1.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 1.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.67,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: compute the sum of common divisors of two numbers. The obfuscated code first computes gcd(a, b), then iterates up to sqrt(gcd), and for each divisor d of the gcd, adds both d and gcd/d (taking care not to double-count when d^2 = gcd). This is exactly the standard algorithm to compute the sum of all divisors of gcd(a, b), which is mathematically equivalent to the sum of all common divisors of a and b. Qwen's description: \"The code calculates the sum of all divisors of the greatest common divisor (GCD) of two numbers, a and b.\" This is semantically correct and captures the core purpose and algorithm. It omits minor implementation details (sqrt optimization, double-count check) but those are not essential to the problem statement. Hence semantic accuracy is perfect, and completeness is high but not maximal because it doesn't mention that this corresponds to the sum of common divisors, nor the optimization details.",
+      "new_problem_evaluation": "Ground truth new problem: given a list of pairs of numbers, compute the sum over the list of (sum of common divisors for each pair). So the intended transformation is to lift the original function to operate on a list of pairs, applying the same 'sum of common divisors' logic per pair and aggregating. The obfuscated new solution, however, is:\n\n    g4_hJ8 = 0\n    for v5_nQ1 in pairs:\n        g4_hJ8 += sum(v5_nQ1[0], v5_nQ1[1])\n    return g4_hJ8\n\nSyntactically, this calls a function named sum with two arguments, which in normal Python would be a TypeError, but in the dataset context it is clearly meant to represent calling the earlier \"sum of common divisors\" function on each pair. Qwen's inferred description: \"The code calculates the sum of sums of pairs of numbers provided in a list called pairs.\" This interprets `sum(v5_nQ1[0], v5_nQ1[1])` as the built-in numeric addition, i.e., just adding the two numbers in each pair, not computing the sum of their common divisors. That loses the core semantics of the original problem. It also fails to mention that the inner operation is supposed to be the same as the raw problem's logic. Therefore semantic accuracy is very low (it describes a different task: summing pairwise sums), and completeness is also very low because the key notion of common divisors is entirely missing.",
+      "transformation_analysis": "The intended transformation from raw to new is: go from a function that, for a single pair (a, b), returns the sum of their common divisors, to a function that takes a list of such pairs and returns the sum of those per-pair results. Qwen correctly recognizes that the new code processes a list of pairs and aggregates a per-pair computation into a total. However, it misidentifies what that per-pair computation is: it treats `sum(v5_nQ1[0], v5_nQ1[1])` as simply adding the two numbers, rather than invoking the previously defined 'sum of common divisors' function. As a result, Qwen does not understand that the new problem is a lifted/aggregated version of the raw problem; it instead thinks the problem itself has changed to a different, simpler operation. Thus, while it sees the structural pattern \"iterate over pairs and accumulate\", it misses the semantic continuity between raw and new. This partial grasp of the transformation warrants a low-to-moderate score.",
+      "obfuscation_handling": "For the raw solution, Qwen handled obfuscation very well. Despite meaningless variable names, it correctly followed the logic: compute gcd, iterate up to sqrt, check divisibility, add both divisor and quotient, avoid double-counting. That shows it relied on control flow and arithmetic structure rather than names. For the new solution, the obfuscation is minimal; the main challenge is that the function name `sum` is overloaded/ambiguous. Qwen defaulted to interpreting it as the built-in numeric sum, rather than as a call to the previously defined custom function that computes sum of common divisors. This indicates a weakness not in handling variable-name obfuscation, but in tracking semantic roles of functions across snippets and recognizing that the same conceptual operation should be reused. Overall, robustness is mixed: strong on the raw code, weak on the new code where it failed to connect the call to the earlier semantics.",
+      "strengths": [
+        "Accurately identified that the raw code computes the sum of all divisors of gcd(a, b), which is equivalent to the sum of common divisors of a and b.",
+        "Correctly understood the optimization pattern using iteration up to sqrt and handling divisor pairs, despite obfuscated variable names.",
+        "Recognized in the new code that there is an aggregation over a list of pairs and that a per-pair computation is being summed."
+      ],
+      "weaknesses": [
+        "For the new problem, misinterpreted the core operation as simply summing the two numbers in each pair, instead of applying the 'sum of common divisors' logic.",
+        "Failed to preserve the key semantic concept of 'common divisors' when moving from the raw to the new problem.",
+        "Did not infer that the `sum` function in the new solution is intended to be the previously defined custom function, not the built-in.",
+        "Consequently, did not correctly understand the relationship between the raw and new problems as a straightforward lifting over a list of pairs."
+      ],
+      "key_insights": "Qwen demonstrates strong low-level semantic understanding of arithmetic and control-flow patterns in obfuscated code: it correctly reconstructs the mathematical intent of the raw function, including the gcd-based divisor-summing algorithm. However, it struggles with higher-level semantic continuity across related snippets, particularly when function names are ambiguous or overloaded. In the new problem, it focuses on the immediate syntax (`sum(a, b)` as numeric addition) rather than reasoning that the same conceptual operation from the raw problem should be applied per pair. This suggests that while Qwen is robust to obfuscated variable names within a single function, it is less robust in tracking and reusing abstract problem semantics across transformations, especially when the code uses generic or misleading identifiers."
+    },
+    "computed_overall_score": 2.6666666666666665
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "problem_id": 29,
+  "source_files": {
+    "ground_truth": "mbpp_pro/29.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/29.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/29.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to sort a list of elements.",
+    "new_problem": "# Given a list of lists, where each sublist contains integers, write a function to sort each sublist and then sort the main list based on the sum of the elements in each sublist."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet implements a modified shell sort algorithm to sort the list `a7b_x` in ascending order.",
+    "new_problem": "The code snippet sorts a list of lists `d3_mk8` based on the sum of elements in each sublist, returning the sorted list."
+  },
+  "judge_evaluation": {
+    "problem_id": 29,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 4.0,
+    "completeness_raw": 5.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 4.0,
+    "robustness_to_obfuscation": 5.0,
+    "overall_score": 4.33,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: “Write a function to sort a list of elements.” The obfuscated raw solution is clearly a comb sort implementation (gap shrinking by ~1.3, swapping when out of order, looping until no swaps and gap==1). Qwen’s inferred raw description: “implements a modified shell sort algorithm to sort the list `a7b_x` in ascending order.”\n\nSemantically, Qwen correctly identifies that the function sorts a list in ascending order. The specific algorithm name is slightly off (comb sort vs. shell sort), but the ground truth problem only requires generic sorting, not algorithm identification. For the purpose of matching the problem description, Qwen fully captures the semantics: input is a list, output is the same list sorted ascending. It also notes that it’s a sorting algorithm, which is exactly the core requirement.\n\nOn completeness, Qwen’s description includes the key behavior (sorting in ascending order) and the correct data structure (a list). There are no additional constraints or nuances in the ground truth that Qwen failed to mention. Thus, for the raw problem, both semantic accuracy and completeness are effectively perfect relative to the ground truth specification.",
+      "new_problem_evaluation": "Ground truth new problem: “Given a list of lists, where each sublist contains integers, write a function to sort each sublist and then sort the main list based on the sum of the elements in each sublist.” The obfuscated new solution:\n```python\nv8_h2n = [x9_qw2(u4_j9) for u4_j9 in d3_mk8]\nv8_h2n.sort(key=lambda z7_p: sum(z7_p))\nreturn v8_h2n\n```\nThis shows that each sublist `u4_j9` is passed through `x9_qw2` (which, from context, is the raw sorter, so it sorts each sublist), then the resulting list of sorted sublists is sorted by the sum of each sublist.\n\nQwen’s inferred new description: “The code snippet sorts a list of lists `d3_mk8` based on the sum of elements in each sublist, returning the sorted list.”\n\nQwen correctly captures that the outer list is sorted based on the sum of each sublist. However, it omits the important detail that each sublist is also individually sorted first. That is a key part of the ground truth problem statement and is present in the code via the list comprehension calling `x9_qw2` on each sublist.\n\nSo semantically, Qwen gets about half of the behavior right (sorting by sum), but misses the per-sublist sorting step. Hence semantic accuracy is good but not perfect. Completeness is lower because one of the two core requirements (sorting each sublist) is not mentioned at all.",
+      "transformation_analysis": "The transformation from raw to new problem in the ground truth is:\n- Start with a function that sorts a single list.\n- Extend it to operate on a list of lists by:\n  1) applying the original sort to each sublist, and\n  2) then sorting the outer list by the sum of each sublist.\n\nQwen’s raw understanding: a function that sorts a list in ascending order. Qwen’s new understanding: a function that sorts a list of lists based on the sum of each sublist.\n\nThis shows that Qwen correctly grasps the high-level transformation pattern: the new problem lifts the original sorting capability to a higher-level structure (list of lists) and introduces an additional sorting criterion (sum of sublists). However, Qwen does not explicitly recognize or mention that the original sorting function is being reused to sort each sublist before the outer sort. That reuse is a central nuance of the transformation in the ground truth.\n\nThus, Qwen understands the main relationship (from simple list sort to list-of-lists sorted by sum) but misses the explicit “sort each sublist using the original function” aspect, so the transformation understanding is good but not complete.",
+      "obfuscation_handling": "Despite obfuscated names (`a7b_x`, `d3_mk8`, `x9_qw2`, etc.), Qwen correctly inferred the core behaviors from control flow and operations:\n\n- For the raw code, it recognized a comparison-and-swap based gap-sorting loop that terminates when no swaps occur and the gap is 1, and correctly concluded that the function sorts the list in ascending order. It did not rely on variable names to infer that behavior.\n\n- For the new code, it recognized that the list comprehension produces a transformed list of sublists and that the subsequent `.sort(key=lambda z7_p: sum(z7_p))` sorts by the sum of each sublist. Again, this is derived from structure and operations, not from names.\n\nThe only significant miss (not mentioning per-sublist sorting) is more about not tying `x9_qw2` back to the original sorter than about being confused by the obfuscation itself. Overall, Qwen shows strong robustness to obfuscation, correctly extracting the main semantics from the code structure.",
+      "strengths": [
+        "Accurately identified that the raw function sorts a list in ascending order, despite obfuscated variable names and a non-trivial sorting algorithm.",
+        "Correctly recognized that the new function operates on a list of lists and sorts based on the sum of each sublist.",
+        "Captured the high-level transformation from a simple list sort to a list-of-lists sort keyed by sublist sums.",
+        "Demonstrated reliance on control flow and operations rather than variable naming to infer semantics."
+      ],
+      "weaknesses": [
+        "Misidentified the specific sorting algorithm as a modified shell sort instead of comb sort (though this does not affect matching the ground truth problem).",
+        "Failed to mention that each sublist is individually sorted before the outer list is sorted by sums, missing a key requirement of the new problem.",
+        "Did not explicitly connect the reuse of the original sorting function (`x9_qw2`) in the transformation from raw to new problem."
+      ],
+      "key_insights": "Qwen shows strong capability to understand the semantics of obfuscated Python code at the level required by typical problem descriptions. It correctly infers the core behavior of a non-trivial sorting loop and the use of `sort(key=...)` on a list of lists. The main gap is in capturing all nuanced steps when multiple layers of transformation are involved (here, per-sublist sorting plus outer sorting by sum). This suggests that while Qwen is robust to obfuscation and good at identifying primary behaviors, it can under-report secondary but important operations, especially when they involve reusing previously defined functionality. For evaluation tasks, this means Qwen’s descriptions are often semantically correct at a high level but may omit some compositional details of multi-step algorithms."
+    },
+    "computed_overall_score": 4.333333333333333
+  }
+}

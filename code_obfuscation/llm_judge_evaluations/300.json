@@ -1,0 +1,46 @@
+{
+  "problem_id": 300,
+  "source_files": {
+    "ground_truth": "mbpp_pro/300.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/300.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/300.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find the nth nonagonal number.",
+    "new_problem": "# Given a list of integers, find the sum of the first 10 nonagonal numbers for each integer in the list. If an integer is less than 1, return 0 for that integer."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates the nth heptagonal number using a mathematical formula.",
+    "new_problem": "The code processes a list to generate a new list where each element is the sum of the first 10 values returned by the function m5_gg, unless the original element is less than 1, in which case it appends 0."
+  },
+  "judge_evaluation": {
+    "problem_id": 300,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 4.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 4.0,
+    "transformation_understanding": 3.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 3.0,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: compute the nth nonagonal number. Formula for the nth nonagonal number is n * (7n - 5) / 2, which matches the given code exactly. Qwen's inference: 'calculates the nth heptagonal number'. So Qwen correctly recognized that this is a polygonal-number formula of the form n * (an + b) / 2, but misidentified the specific polygon: it said heptagonal (7-sided) instead of nonagonal (9-sided). Semantically, that is a categorical error: the problem is specifically about nonagonal numbers. It did understand that the function takes n and returns the nth polygonal number via a closed-form formula, but the core semantic label (nonagonal vs heptagonal) is wrong. Completeness is also low because it doesn't specify input/output clearly (e.g., integer n → nth nonagonal number) and misnames the type of figurate number.",
+      "new_problem_evaluation": "Ground truth new problem: For each integer in a list, compute the sum of the first 10 nonagonal numbers; if the integer is < 1, return 0 for that position. The provided obfuscated code: it iterates over f8_lst, appends 0 if element < 1, otherwise computes sum(m5_gg(k) for k in range(1, 11)) and appends that. Qwen's inference: 'processes a list to generate a new list where each element is the sum of the first 10 values returned by the function m5_gg, unless the original element is less than 1, in which case it appends 0.' This is almost exactly the operational behavior of the code. It correctly captures: (1) list input and list output, (2) element-wise processing, (3) conditional 0 when element < 1, and (4) summing the first 10 outputs of m5_gg. It does not explicitly say these are nonagonal numbers, but given that its raw-problem understanding already mislabeled them as heptagonal, this omission is consistent. From the code alone, without knowing m5_gg, Qwen's description of the new problem is structurally accurate and nearly complete with respect to the implemented behavior, though it misses the semantic intent 'sum of first 10 nonagonal numbers' and instead treats m5_gg as a black box. Hence high but not perfect scores.",
+      "transformation_analysis": "The raw→new transformation in the ground truth is: go from computing a single nth nonagonal number to, for each integer in a list, computing the sum of the first 10 nonagonal numbers (1 through 10) if the integer is ≥ 1, else 0. Conceptually, the new problem wraps the base figurate-number function and aggregates its first 10 values, applied conditionally per list element. Qwen's new-problem description reflects that the new code 'sums the first 10 values returned by m5_gg' and applies this per list element with a <1 check. This shows it understood the structural transformation: from scalar function to list-processing function that uses the scalar function repeatedly over k=1..10 and sums. However, Qwen did not connect the semantic meaning across raw and new problems: it never states that m5_gg is the same polygonal-number function from the raw problem, nor that the new problem is 'sum of first 10 nonagonal numbers per list element'. Also, in the raw description it mislabels the figurate type as heptagonal, and in the new description it avoids naming it at all. So it partially grasps the transformation at the code-structure level (reuse of base function, summation over first 10 indices, conditional behavior) but not at the semantic problem-description level.",
+      "obfuscation_handling": "The obfuscation here is mainly in variable and function names (m5_gg, f8_lst, etc.), while the core formula and control structure are clear. Qwen correctly inferred that the new function iterates over a list, checks if each element is <1, and otherwise sums m5_gg(k) for k in 1..10. That shows it relied on the control-flow and comprehension structure rather than names, which is good robustness to obfuscation for the new problem. For the raw problem, the main challenge is interpreting the formula n * (7n - 5) / 2. Qwen recognized it as a polygonal-number formula but misidentified which one, indicating partial mathematical understanding but not full precision. This error is not due to obfuscation but to formula misclassification. Overall, Qwen handled the obfuscated names reasonably well, especially in the new problem, but its semantic linkage between the two problems and precise identification of the figurate number type was weak.",
+      "strengths": [
+        "Correctly recognized that the raw function computes a polygonal number via a closed-form quadratic formula in n.",
+        "Accurately described the new function’s operational behavior: iterating over a list, conditional 0 for elements <1, and summing the first 10 outputs of a helper function.",
+        "Did not rely on variable names; instead used the code structure (for-loop, range(1, 11), sum over generator) to infer behavior.",
+        "Captured the idea that the new problem reuses a base function (m5_gg) multiple times and aggregates its results."
+      ],
+      "weaknesses": [
+        "Misidentified the specific figurate number in the raw problem, calling it heptagonal instead of nonagonal.",
+        "Did not explicitly connect that m5_gg is the same figurate-number function from the raw problem when describing the new problem.",
+        "Failed to mention the semantic intent 'sum of the first 10 nonagonal numbers' in the new problem, treating m5_gg as a black box.",
+        "Transformation understanding is only structural; it does not articulate the conceptual evolution from 'nth nonagonal number' to 'sum of first 10 nonagonal numbers per list element'."
+      ],
+      "key_insights": "Qwen shows solid ability to follow control flow and higher-level structure even with obfuscated names, particularly for the list-processing and summation logic in the new problem. Its main weakness here is not in handling obfuscation but in precise mathematical semantics: it recognizes the general class of the formula (polygonal numbers) but mislabels the specific type and does not propagate that semantic meaning into the new problem description. This suggests that Qwen can robustly understand how code transforms data (loops, conditionals, aggregations) but may be less reliable when exact domain-specific formulas or classifications (e.g., which k-gonal number) are required, and it may fail to explicitly link related functions across problem variants at the semantic level."
+    },
+    "computed_overall_score": 3.0
+  }
+}

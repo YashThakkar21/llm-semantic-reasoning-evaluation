@@ -1,0 +1,45 @@
+{
+  "problem_id": 227,
+  "source_files": {
+    "ground_truth": "mbpp_pro/227.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/227.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/227.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a python function to find the sum of the largest and smallest value in a given array.",
+    "new_problem": "# Given a list of arrays, write a Python function to find the sum of the largest and smallest values for each array, and then return the sum of these sums."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates the sum of the maximum and minimum values in the list o0O_l1.",
+    "new_problem": "The code calculates the sum of the lengths of all elements in the iterable _O0o1l, assuming each element is iterable itself."
+  },
+  "judge_evaluation": {
+    "problem_id": 227,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 1.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 1.0,
+    "transformation_understanding": 1.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.5,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, Qwen's description matches the ground truth semantics very closely. The ground truth is: \"find the sum of the largest and smallest value in a given array.\" The code is `return max(o0O_l1) + min(o0O_l1)`. Qwen's inference: \"The code calculates the sum of the maximum and minimum values in the list o0O_l1.\" This is semantically correct: it identifies max and min, sums them, and recognizes the input as a list. The only minor omission is that it doesn't explicitly say this is a function that takes a list/array as input and returns that sum, but the core purpose, operations, and I/O are clearly captured. Hence high semantic accuracy and near-complete description.",
+      "new_problem_evaluation": "For the new problem, there is a major semantic mismatch. Ground truth: \"Given a list of arrays, write a Python function to find the sum of the largest and smallest values for each array, and then return the sum of these sums.\" That implies for each sub-array: compute max+min, then sum those results across all arrays. The obfuscated code is `return sum(I1l_O0(ll1_oO) for ll1_oO in _O0o1l)`. Given the original dataset pattern, `I1l_O0` is almost certainly the helper that implements the raw behavior (sum of max and min for a single array). So the new solution is: for each array in `_O0o1l`, call the helper (max+min), then sum those values. Qwen instead infers: \"The code calculates the sum of the lengths of all elements in the iterable _O0o1l, assuming each element is iterable itself.\" That assumes `I1l_O0` is `len`, which is unsupported by the given context and contradicts the known transformation pattern. This misses the core semantics (max/min per sub-array) and misidentifies the operation (length instead of max+min). It also fails to mention that the function is aggregating per-array computations of extremal values. Thus semantic accuracy and completeness for the new problem are both very low.",
+      "transformation_analysis": "The transformation from raw to new problem in the ground truth is: lift the single-array operation (sum of max and min) to a higher-order operation over a list of arrays, summing the per-array results. Qwen correctly understood the raw operation, but in the new problem it reinterpreted the helper function as computing lengths rather than reusing the previously inferred max+min behavior. As a result, it did not recognize that the new code is simply mapping the original operation over a collection and summing. It therefore fails to capture the relationship between raw and new problems: that the new problem is a straightforward generalization/composition of the raw one. Transformation understanding is thus poor.",
+      "obfuscation_handling": "On the raw snippet, Qwen handled obfuscation well: despite the meaningless name `o0O_l1`, it relied on the clear built-ins `max` and `min` and correctly inferred the semantics. This shows it can focus on structure and standard library behavior rather than variable names. However, for the new snippet, the obfuscated helper name `I1l_O0` appears to have led Qwen to guess its behavior (as `len`) instead of inferring that it likely corresponds to the previously analyzed function (sum of max and min). The code structure `sum(I1l_O0(ll1_oO) for ll1_oO in _O0o1l)` is generic enough that multiple interpretations are possible, but given the context of the raw problem, the most coherent reading is that `I1l_O0` is the raw function. Qwen did not leverage that contextual linkage, suggesting limited robustness when obfuscation hides the connection between helper functions and earlier logic.",
+      "strengths": [
+        "Accurately inferred the semantics of the raw code using max and min despite obfuscated variable names.",
+        "Correctly identified the input type (list) and the operation (sum of max and min) for the raw problem.",
+        "Demonstrated reliance on standard library function behavior rather than variable naming for the raw snippet."
+      ],
+      "weaknesses": [
+        "Misinterpreted the helper function `I1l_O0` in the new code as computing lengths instead of reusing the raw max+min behavior.",
+        "Failed to recognize that the new problem is a higher-order aggregation of the raw problem over a list of arrays.",
+        "Did not mention key semantics for the new problem: per-array max/min computation and summation of those results.",
+        "Did not leverage contextual consistency between raw and new problems to constrain the interpretation of the obfuscated helper."
+      ],
+      "key_insights": "Qwen can accurately understand simple, direct uses of well-known built-ins (like max and min) even with obfuscated variable names, indicating good structural reasoning at the function-call level. However, when semantics depend on recognizing that an obfuscated helper function in a new snippet corresponds to a previously analyzed operation, Qwen may instead guess a generic behavior (like length) based solely on the outer pattern (a sum over a generator). This reveals a gap in its ability to track and reuse inferred semantics of helper functions across related code snippets, especially under obfuscation. The model is strong on local, single-function understanding but weaker on cross-snippet, contextual semantic linking."
+    },
+    "computed_overall_score": 2.5
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "problem_id": 279,
+  "source_files": {
+    "ground_truth": "mbpp_pro/279.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/279.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/279.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a python function which takes a list of lists, where each sublist has two elements, and returns a list of two lists where the first list has the first element of each sublist and the second one has the second.",
+    "new_problem": "# Given a list of lists, where each sublist has three elements, write a function that returns a list of three lists where the first list contains the first element of each sublist, the second list contains the second element of each sublist, and the third list contains the third element of each sublist. Additionally, the function should also return a list of two lists where the first list contains the first and second elements of each sublist combined, and the second list contains the second and third elements of each sublist combined."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet transposes a list of lists (or tuples) named `b7x_2q`.",
+    "new_problem": "The code snippet processes a list of lists (or tuples) named `b7x_2q`, creating three new structures: the original list, a list of pairs formed from the first and second elements of each sublist, and a list of pairs formed from the second and third elements of each sublist. It then returns these three structures."
+  },
+  "judge_evaluation": {
+    "problem_id": 279,
+    "semantic_accuracy_raw": 4.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 3.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.0,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: given a list of 2‑element sublists, return two lists: one of all first elements, one of all second elements. The obfuscated solution `return [list(a3f_9) for a3f_9 in list(zip(*b7x_2q))]` is a standard transpose of a 2D structure. Qwen's description: \"The code snippet transposes a list of lists (or tuples) named `b7x_2q`.\" Semantically, this is essentially correct: transposing a list of 2‑element lists yields exactly the two lists of first and second elements. However, Qwen's description is generic and does not explicitly mention that each sublist has two elements or that the result is a list of two lists corresponding to first and second positions. So the core operation (transpose) is correctly captured, but the problem‑specific input/output structure and constraints are under‑specified.",
+      "new_problem_evaluation": "Ground truth new problem: list of 3‑element sublists; return (1) a list of three lists: first elements, second elements, third elements; and (2) a list of two lists: [first, second] pairs and [second, third] pairs. The obfuscated code:\n\n```python\nz9_kq3m_7x = m5_wr8([[p2_vn9[0], p2_vn9[1]] for p2_vn9 in b7x_2q])\nh4_yt6_p1w = m5_wr8([[p2_vn9[1], p2_vn9[2]] for p2_vn9 in b7x_2q])\nreturn m5_wr8(b7x_2q), z9_kq3m_7x, h4_yt6_p1w\n```\nThis code does NOT implement the ground truth description: it returns (a) the original list of 3‑element sublists, (b) the [first, second] pairs, and (c) the [second, third] pairs. It never constructs the three separate lists of first/second/third elements (no transpose). Qwen's description: \"creating three new structures: the original list, a list of pairs formed from the first and second elements of each sublist, and a list of pairs formed from the second and third elements of each sublist. It then returns these three structures.\" This matches the actual obfuscated code very well, but diverges from the ground truth problem statement. Relative to the ground truth, Qwen misses the requirement to build three separate lists of the individual positions and instead treats the original list as the first returned structure. So semantically, Qwen is accurate about the code, but not about the intended problem; in this evaluation we compare to the ground truth problem, so its semantic accuracy and completeness are only partial.",
+      "transformation_analysis": "Ground truth transformation: from a simple 2‑column transpose (two lists of first/second elements) to a richer 3‑column problem that (1) generalizes the transpose to three positions and (2) additionally returns two lists of adjacent pairs ([0,1] and [1,2]). Conceptually, the new problem extends the original by increasing arity (2→3) and adding extra derived structures.\n\nQwen's inferred transformation: raw problem is described as a generic transpose; new problem is described as returning three structures: the original list, [0,1] pairs, and [1,2] pairs. Qwen therefore sees the evolution as: from a transpose to a function that returns the original plus two derived pair lists. It does not recognize that, per the ground truth, the new problem should still include a transpose‑like component (three lists of first/second/third elements). It also does not explicitly relate the raw and new problems in terms of \"we generalized from 2‑element to 3‑element sublists and added extra outputs\". Thus, its understanding of the relationship between raw and new problems is incomplete and somewhat misaligned with the intended evolution, even though it is consistent with the given obfuscated code.",
+      "obfuscation_handling": "Despite obfuscated names (`b7x_2q`, `p2_vn9`, `m5_wr8`), Qwen correctly inferred the structural operations from the code: in the raw solution, it recognized `zip(*b7x_2q)` as a transpose; in the new solution, it correctly read the list comprehensions indexing `[0], [1], [2]` and understood that two lists of adjacent pairs are being built and that the original list is returned alongside them. This shows it relied on indexing patterns and return structure rather than variable names. The main discrepancies arise not from obfuscation but from the mismatch between the obfuscated code and the ground truth new problem description; Qwen stayed faithful to the code semantics rather than the intended (but not implemented) transpose of three columns.",
+      "strengths": [
+        "Correctly identified the raw solution as a transpose operation on a list of lists/tuples.",
+        "Accurately described the new solution's behavior: returning the original list plus two lists of adjacent element pairs.",
+        "Showed robustness to meaningless variable names by focusing on indexing and structural patterns.",
+        "Captured the correct number and nature of returned structures in the new solution (original, [0,1] pairs, [1,2] pairs)."
+      ],
+      "weaknesses": [
+        "Raw problem description is too generic; it omits that each sublist has exactly two elements and that the result is specifically two lists of first and second elements.",
+        "For the new problem, it does not mention the three separate lists of first/second/third elements required by the ground truth, because the code does not implement them.",
+        "Does not articulate the conceptual transformation from a 2‑element transpose to a 3‑element transpose plus extra pair lists.",
+        "Treats the original list as a primary returned structure in the new problem, which diverges from the ground truth specification."
+      ],
+      "key_insights": "Qwen demonstrates strong code‑level semantic understanding, especially of structural list operations, even under heavy obfuscation. It correctly interprets `zip(*...)` as a transpose and decodes list comprehensions with positional indexing into meaningful descriptions of the outputs. However, its descriptions tend to be code‑centric and somewhat generic, not fully elaborating the problem constraints (e.g., fixed sublist length) or mapping them back to the more problem‑oriented phrasing of the ground truth. In the new problem, Qwen stays faithful to the actual obfuscated implementation, which appears inconsistent with the ground truth specification; this highlights that Qwen is accurately reading the code but not inferring an intended but unimplemented transpose step. Overall, it is robust to obfuscation and structurally accurate, but less strong at reconstructing the full, high‑level problem statement and its evolution."
+    },
+    "computed_overall_score": 3.0
+  }
+}

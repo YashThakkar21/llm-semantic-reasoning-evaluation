@@ -1,0 +1,44 @@
+{
+  "problem_id": 149,
+  "source_files": {
+    "ground_truth": "mbpp_pro/149.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/149.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/149.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find the list of maximum length in a list of lists.",
+    "new_problem": "# Given a list of lists, where each sublist contains integers, find the sublist with the maximum sum and the sublist with the maximum length. If there are multiple sublists with the same maximum sum, return the one with the longest length. If there are multiple sublists with the same maximum length, return the one with the highest sum."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet finds and returns the longest list from a list of lists.",
+    "new_problem": "The code snippet compares two lists (one found by the function `w2_fn9` and another by directly using `max` with `sum` as the key) and returns the list with the greater sum. If both have the same sum, it returns the longer list."
+  },
+  "judge_evaluation": {
+    "problem_id": 149,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 5.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 3.17,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: find the list of maximum length in a list of lists. Obfuscated raw solution: `return max([(len(a7_), a7_) for a7_ in b3x9], key=lambda q2z: q2z[0])`. This clearly returns the longest sublist (wrapped in a tuple, but conceptually the longest list). Qwen's inferred raw description: \"The code snippet finds and returns the longest list from a list of lists.\" This matches the semantics exactly: it identifies the core purpose (longest sublist), the input (list of lists), and the output (the longest list). There are no missing constraints or nuances at the raw level, so both semantic accuracy and completeness for the raw problem are excellent.",
+      "new_problem_evaluation": "Ground truth new problem: Given a list of lists of integers, find (1) the sublist with maximum sum and (2) the sublist with maximum length, and then choose between them with tie-breaking rules: if multiple max-sum sublists, pick the longest; if multiple max-length sublists, pick the one with highest sum. The new obfuscated solution, however, does something different: it computes `k8_m4x = max(z9_l0p, key=sum)` (max-sum sublist), then `v3_r7t = w2_fn9(z9_l0p)[1]` (intended to be the longest sublist, but `w2_fn9` actually returns a `(len, list)` tuple, so indexing `[1]` is needed to get the list). Then it compares sums of these two chosen sublists and returns the one with larger sum; if sums are equal, it returns the longer list. This logic only compares *two* specific sublists (one max-sum, one max-length) and then chooses based on sum-first, length-second. It does not implement the full tie-breaking rules described in the ground truth, nor does it explicitly handle multiple max-sum or multiple max-length sublists beyond what `max`'s default behavior does.\n\nQwen's new-problem inference: \"The code snippet compares two lists (one found by the function `w2_fn9` and another by directly using `max` with `sum` as the key) and returns the list with the greater sum. If both have the same sum, it returns the longer list.\" This is a good description of what the *given obfuscated new solution* actually does, but it does not match the ground truth new problem specification. It misses the fact that the problem is about finding the max-sum sublist and the max-length sublist from the entire collection, and then applying specific tie-breaking rules for multiple candidates. Qwen focuses only on the final comparison logic between two preselected lists and does not mention the broader problem requirements or the intended tie-breaking behavior. Therefore, relative to the ground truth new problem, semantic accuracy is low (it describes a different, narrower task), and completeness is also low because it omits the multi-candidate and tie-breaking aspects.",
+      "transformation_analysis": "The ground truth transformation is: start from a simple task (find the longest sublist) and evolve to a richer task that simultaneously considers maximum sum and maximum length, with explicit tie-breaking rules when there are multiple candidates for each criterion. Conceptually, the new problem builds on the raw one by reusing the 'longest list' logic as one component in a more complex decision.\n\nQwen's view of the transformation, implied by its two descriptions, is: raw problem = find the longest list; new problem = compare the list found by the raw function with the list found by `max(..., key=sum)` and choose based on sum then length. This captures that the new code *uses* the raw function as a helper and adds a comparison step, but it does not recognize or articulate the intended higher-level problem: selecting among all sublists based on both sum and length with specific tie-breaking. It treats the new code as a simple two-list comparison rather than as an evolved specification over the whole list of lists. Thus, its understanding of the relationship between raw and new problems is only partially correct (\"new uses raw and adds extra logic\") but misses the semantic upgrade described in the ground truth.",
+      "obfuscation_handling": "For the raw solution, obfuscation had almost no impact: the structure `max([(len(a7_), a7_) for a7_ in b3x9], key=lambda q2z: q2z[0])` is straightforward, and Qwen correctly inferred that it returns the longest list. This shows good robustness to bad variable names when the pattern is simple.\n\nFor the new solution, Qwen correctly identified that `max(z9_l0p, key=sum)` finds the sublist with the greatest sum, and that `w2_fn9(z9_l0p)` is used to obtain another list (intended to be the longest). It also correctly read the subsequent conditional logic comparing sums and then lengths. So at the code level, Qwen handled the obfuscation reasonably well and accurately described what the code does. However, it did not reconcile this with the more nuanced ground truth specification (multiple candidates, explicit tie-breaking rules). Its robustness is decent in terms of reading the obfuscated code, but weaker in mapping that behavior back to the intended, richer problem statement.",
+      "strengths": [
+        "Perfect understanding of the raw obfuscated solution: correctly identified it as returning the longest sublist from a list of lists.",
+        "Accurate reading of the new obfuscated code's control flow: recognized the two candidate lists (max-sum and the one from `w2_fn9`) and the sum-first, length-second comparison.",
+        "Did not rely on variable names; instead, it inferred behavior from constructs like `max(..., key=sum)` and the tuple structure in the raw helper."
+      ],
+      "weaknesses": [
+        "For the new problem, Qwen's description aligns with the literal code but not with the ground truth specification, missing the intended multi-candidate and tie-breaking semantics.",
+        "It did not articulate that the new problem is about finding both the max-sum and max-length sublists over the entire collection and resolving ties according to specified rules.",
+        "Transformation understanding is shallow: it notes that the new code uses the raw helper and adds a comparison, but does not capture the conceptual evolution from a simple 'longest list' task to a combined 'max sum / max length with tie-breaking' task."
+      ],
+      "key_insights": "Qwen is strong at local semantic understanding of obfuscated Python code: it correctly interprets `max` with custom keys, tuple-based selection, and conditional comparisons even when variable names are meaningless. For the raw problem, this yields a perfect match with the ground truth. However, when the ground truth new problem introduces a richer, more abstract specification than what the provided code strictly enforces, Qwen tends to describe the concrete code behavior rather than infer or align with the higher-level intended problem. This leads to a mismatch in semantic accuracy and completeness relative to the dataset's new problem description, even though its reading of the obfuscated code itself is largely correct. The main limitation is in mapping from code behavior to the full, nuanced problem statement, not in handling obfuscation per se."
+    },
+    "computed_overall_score": 3.1666666666666665
+  }
+}

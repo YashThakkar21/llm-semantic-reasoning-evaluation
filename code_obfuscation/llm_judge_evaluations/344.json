@@ -1,0 +1,47 @@
+{
+  "problem_id": 344,
+  "source_files": {
+    "ground_truth": "mbpp_pro/344.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/344.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/344.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a python function to get the difference between two lists.",
+    "new_problem": "# Given a list of lists, write a Python function to find the symmetric difference between each pair of lists and return a list of these differences. If there are an odd number of lists, the last list should be compared with the first list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet finds and returns a list containing elements that are unique to each of the two input sets, x7z_ and q2w_.",
+    "new_problem": "The code snippet calculates the difference between consecutive elements in a circular manner from the list m8_list_z using a function named Diff and returns a list of these differences."
+  },
+  "judge_evaluation": {
+    "problem_id": 344,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 3.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.67,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: get the difference between two lists (intended as symmetric difference). The obfuscated solution uses `list(set(x7z_) - set(q2w_)) + list(set(q2w_) - set(x7z_))`, which indeed computes the symmetric difference between two lists via sets.\n\nQwen's inference: \"finds and returns a list containing elements that are unique to each of the two input sets, x7z_ and q2w_.\" Semantically, this is exactly what the code does: it returns elements unique to each list (i.e., symmetric difference). It correctly identifies that both inputs are treated as sets and that the result is the union of elements unique to each side.\n\nMinor completeness issue: Qwen calls them \"input sets\" rather than lists, and does not mention that the implementation converts lists to sets (thus removing duplicates and ignoring order). But the core semantic meaning—symmetric difference of two collections—is captured accurately.",
+      "new_problem_evaluation": "Ground truth new problem: Given a list of lists, compute the symmetric difference between each pair of lists and return a list of these differences, pairing list i with list i+1, and the last with the first (circular pairing).\n\nObfuscated code:\n```python\na9b_3x = []\nk5_len = len(m8_list_z)\nfor p2i_ in range(k5_len):\n    v4_diff = Diff(m8_list_z[p2i_], m8_list_z[(p2i_ + 1) % k5_len])\n    a9b_3x.append(v4_diff)\nreturn a9b_3x\n```\nThis clearly iterates over indices, uses modulo to wrap around, and calls `Diff` on each adjacent pair, including last–first. Given the raw problem's `Diff` is symmetric difference between two lists, the new problem is \"symmetric difference between each adjacent pair of lists in a circular fashion\".\n\nQwen's inference: \"calculates the difference between consecutive elements in a circular manner from the list m8_list_z using a function named Diff and returns a list of these differences.\" Qwen correctly identifies:\n- Consecutive pairing\n- Circular behavior via wrap-around\n- Use of a `Diff` function\n- Returns a list of results\n\nHowever, it misses the crucial semantic that these \"elements\" are themselves lists and that `Diff` is specifically computing a symmetric difference between two lists (as established by the raw problem). It describes only a generic \"difference\" between consecutive elements, not the specific operation or that the input is a list of lists. So the structural behavior is right, but the domain semantics are underspecified.",
+      "transformation_analysis": "The transformation from raw to new problem is: extend the binary symmetric-difference function on two lists to operate pairwise over a circular sequence of lists, returning all pairwise symmetric differences.\n\nQwen implicitly understands the structural transformation: it recognizes that the new code applies `Diff` repeatedly over consecutive (and circular) pairs from a list and aggregates the results. This matches the raw→new pattern: from single call `Diff(a, b)` to repeated calls `Diff(list[i], list[(i+1)%n])`.\n\nWhat Qwen does not explicitly capture is that `Diff` itself is the symmetric-difference operation defined in the raw problem. It treats `Diff` as a black box computing some generic \"difference\". Thus, while it understands the control-flow and iteration transformation, it does not fully articulate the semantic lifting from \"difference between two lists\" to \"symmetric difference between each pair of lists in a list-of-lists\".\n\nOverall, it gets the structural evolution (pairwise, circular, aggregation) but only partially the semantic evolution (what kind of difference, and on what type of elements).",
+      "obfuscation_handling": "The obfuscation mainly affects variable names (`x7z_`, `q2w_`, `m8_list_z`, `p2i_`, etc.), but the control structures and operations are clear.\n\nFor the raw problem, Qwen was robust: it correctly inferred that the expression `set(a) - set(b)` plus the reverse computes elements unique to each side, i.e., symmetric difference, despite meaningless variable names. This shows it relied on the set operations, not names.\n\nFor the new problem, Qwen correctly read the loop, index arithmetic, and modulo to infer circular consecutive pairing, again ignoring obfuscated names. The main weakness is not due to obfuscation but to not tying `Diff` back to the previously inferred symmetric-difference semantics and not recognizing that the list elements are themselves lists.\n\nThus, Qwen handled obfuscation well at the control-flow and operation level, but did not fully propagate semantic knowledge of `Diff` into the new problem description.",
+      "strengths": [
+        "Accurately identified that the raw solution computes elements unique to each of the two inputs (symmetric difference).",
+        "Correctly recognized the use of set difference and the union of both directions in the raw code.",
+        "Correctly understood the loop structure in the new code: iterating over indices, pairing each element with the next, and wrapping around circularly.",
+        "Recognized that the new function aggregates results of `Diff` calls into a list.",
+        "Showed robustness to meaningless variable names by focusing on operations and control flow."
+      ],
+      "weaknesses": [
+        "Did not explicitly state that the raw problem works on lists (converted to sets) and that duplicates/order are lost.",
+        "In the new problem, failed to mention that `m8_list_z` is a list of lists, and that each element is a list, not a scalar.",
+        "Described `Diff` in the new problem only as computing a generic \"difference\" rather than specifically the symmetric difference between two lists, missing an important semantic link to the raw problem.",
+        "Did not fully articulate that the transformation is from a binary symmetric-difference function to a pairwise, circular application over a list-of-lists."
+      ],
+      "key_insights": "Qwen demonstrates strong structural and operational understanding of the code, even with obfuscated names. It correctly interprets set operations and loop/index patterns, including circular indexing via modulo. For the raw problem, this leads to an essentially perfect semantic description of symmetric difference. For the new problem, Qwen captures the iteration pattern and circular nature but stops at a generic notion of \"difference\" and does not propagate the previously inferred semantics of `Diff` or the fact that the elements are lists. This suggests that while Qwen is robust to obfuscation and good at local code reasoning, it sometimes treats helper functions (like `Diff`) as opaque and does not always integrate cross-context semantic information when describing higher-level problem transformations."
+    },
+    "computed_overall_score": 3.6666666666666665
+  }
+}

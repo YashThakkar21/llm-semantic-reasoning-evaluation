@@ -1,0 +1,45 @@
+{
+  "problem_id": 84,
+  "source_files": {
+    "ground_truth": "mbpp_pro/84.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/84.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/84.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to sort a list of elements.",
+    "new_problem": "# Given a list of lists, where each sublist contains unsorted elements, write a function to sort each sublist and then sort the main list based on the sum of elements in each sublist."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet sorts a list by repeatedly finding the maximum element in the unsorted portion and moving it to its correct position, effectively implementing a reverse bubble sort.",
+    "new_problem": "The code snippet applies a function to each element of a list, sorts the resulting list based on the sum of the elements in each sublist, and returns the sorted list."
+  },
+  "judge_evaluation": {
+    "problem_id": 84,
+    "semantic_accuracy_raw": 4.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 3.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.5,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: just 'sort a list of elements' (no algorithm specified). The obfuscated code is a pancake-sort-like routine: it repeatedly finds the max in the prefix, flips that prefix, then flips the growing sorted suffix. Qwen describes it as 'sorts a list by repeatedly finding the maximum element in the unsorted portion and moving it to its correct position, effectively implementing a reverse bubble sort.' Semantically, Qwen correctly identifies that the function sorts a list and that it repeatedly finds the maximum in the unsorted portion and moves it into place. Calling it a 'reverse bubble sort' is algorithmically inaccurate, but the high-level semantics (input: list, output: sorted list, mechanism: repeated max selection and repositioning) are right. Since the ground truth only cares that it's a sorting function, Qwen's description is slightly more specific than needed and mostly correct. Completeness is also good: it captures the core purpose (sorting) and the main operational idea (max element selection and placement), which is more detail than the ground truth requires.",
+      "new_problem_evaluation": "Ground truth new problem: given a list of lists, first sort each sublist, then sort the main list by the sum of each sublist. The obfuscated code: `r5_Hj9 = [v2_Nm4(k8_Tr1) for k8_Tr1 in w3_Yz6]; r5_Hj9.sort(key=lambda f1_Qx7: sum(f1_Qx7)); return r5_Hj9`. The missing piece is that `v2_Nm4` is the earlier sorting function, so each sublist is sorted before the outer list is sorted by sum. Qwen's description: 'applies a function to each element of a list, sorts the resulting list based on the sum of the elements in each sublist, and returns the sorted list.' This correctly captures: (1) input is a list whose elements are sublists, (2) a function is applied to each sublist, (3) the outer list is sorted by sum of sublists. However, Qwen does not explicitly state that the applied function is itself a sorting function, so it misses the explicit requirement 'sort each sublist'. Semantically it's close but underspecified: 'applies a function' is weaker than 'sorts each sublist'. Completeness is therefore partial: it gets the outer sorting-by-sum behavior right, but omits the key nuance that the inner function is specifically a sort.",
+      "transformation_analysis": "The transformation from raw to new problem in the ground truth is: extend a simple list-sorting function to operate on a list of lists by (a) using the original sort on each sublist, and (b) then sorting the list of sublists by the sum of their elements. Qwen's raw description recognizes that the base function is a sorting routine (though mislabeling the algorithm type). In the new description, Qwen recognizes that the new function maps another function over the elements and then sorts by sum, but it abstracts away what that inner function does. Thus, Qwen partially captures the transformation pattern: 'wrap the original function and then sort by sum', but it does not explicitly articulate that the transformation is 'use the previous sorting function on each sublist, then sort by sum'. As a result, its understanding of the relationship between raw and new problems is only moderate: it sees a higher-order application and a new sort criterion, but not the explicit reuse of the original sorting semantics.",
+      "obfuscation_handling": "Despite obfuscated names (`x9_Bw2`, `a7_zQ3`, `v2_Nm4`, etc.), Qwen correctly infers that the first function is a sorting routine and that the second function processes a list of sublists and sorts them by sum. It relies on structural cues: use of `max(...)`, slicing and concatenation patterns that implement prefix reversals, and `list.sort(key=lambda sum(...))`. It does not get misled by the meaningless variable names. The main weakness is not due to obfuscation but to not tying `v2_Nm4` back to the original sort function and not naming that behavior explicitly. Overall, Qwen shows good robustness to obfuscation, correctly identifying the core semantics from control flow and operations rather than identifiers.",
+      "strengths": [
+        "Correctly identified that the raw function is a sorting routine operating on a list.",
+        "Accurately described the iterative selection of the maximum element from the unsorted portion and moving it into place.",
+        "Recognized that the new function operates on a list of sublists and sorts the outer list by the sum of each sublist.",
+        "Handled obfuscated variable and function names well, relying on operations like `max`, slicing, and `sort(key=...)` to infer behavior."
+      ],
+      "weaknesses": [
+        "Mischaracterized the specific algorithm as a 'reverse bubble sort' rather than a pancake/selection-like approach, though this does not affect the high-level semantics.",
+        "Did not explicitly state that the inner function applied to each sublist in the new problem is a sorting function, weakening the match to 'sort each sublist'.",
+        "Did not clearly articulate the reuse of the original sorting function in the new problem, so the raw→new transformation is only partially captured."
+      ],
+      "key_insights": "Qwen demonstrates that it can infer the core semantics of obfuscated Python code by focusing on control flow and standard library operations rather than identifier names. For the raw problem, it not only recognized that the function sorts but also described the high-level mechanism of repeatedly placing the maximum element, indicating a fairly deep structural understanding. For the new problem, it correctly recognized the higher-order pattern (map a function over elements, then sort by a key) and the use of `sum` as the key, but it failed to connect the inner function explicitly to 'sorting each sublist', which is the central nuance of the ground truth. This suggests that while Qwen is robust to obfuscation and good at recognizing common patterns (sorting, mapping, key-based sort), it may sometimes under-specify or abstract away the exact role of composed functions when that role must be inferred from context rather than explicit naming."
+    },
+    "computed_overall_score": 3.5
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "problem_id": 305,
+  "source_files": {
+    "ground_truth": "mbpp_pro/305.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/305.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/305.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# The input is given as - a dictionary with a student name as a key and a tuple of float (student_height, student_weight) as a value, - minimal height, - minimal weight. Write a function to filter students that have height and weight above the minimum.",
+    "new_problem": "# Given a list of dictionaries, each representing a class with a class name as the key and a dictionary of students as the value. Each student dictionary has a student name as the key and a tuple of float (student_height, student_weight) as the value. Additionally, there are two dictionaries: one for minimal height requirements and one for minimal weight requirements, where the keys are class names and the values are the respective minimum height and weight. Write a function to filter out students in each class that do not meet the minimum height and weight requirements for their class."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet filters a dictionary based on whether the values (which are lists) meet certain minimum threshold conditions for their first and second elements.",
+    "new_problem": "The code snippet processes a nested dictionary, applying a filtering function to each inner dictionary based on thresholds retrieved from other dictionaries, and compiles the results into a new dictionary."
+  },
+  "judge_evaluation": {
+    "problem_id": 305,
+    "semantic_accuracy_raw": 4.0,
+    "semantic_accuracy_new": 4.0,
+    "completeness_raw": 3.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 4.0,
+    "robustness_to_obfuscation": 5.0,
+    "overall_score": 3.83,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, the ground truth is specifically about filtering a dictionary of students where each value is a tuple (height, weight), keeping only those with height and weight above given minima. Qwen's description: \"filters a dictionary based on whether the values (which are lists) meet certain minimum threshold conditions for their first and second elements.\" Semantically, this is very close: it correctly identifies that the code filters a dictionary, that the values are indexable sequences with at least two elements, and that the first and second elements are compared against minimum thresholds. It misses the domain context (students, height, weight) and calls them lists instead of tuples, but that does not affect the core computational semantics. It also does not explicitly mention that both conditions must be satisfied (though \"meet certain minimum threshold conditions for their first and second elements\" implies both). Overall, the semantic understanding of what the code does is strong, but the description is generic and omits the problem-specific meaning of the data, so semantic accuracy is high but not perfect, and completeness is only moderate.",
+      "new_problem_evaluation": "For the new problem, the ground truth describes a nested structure: a list of class dictionaries, each mapping a class name to a student dictionary; each student dictionary maps student names to (height, weight) tuples. There are also two separate dictionaries mapping class names to minimum height and weight, and the task is to filter out students in each class who do not meet their class-specific minima. Qwen's description: \"processes a nested dictionary, applying a filtering function to each inner dictionary based on thresholds retrieved from other dictionaries, and compiles the results into a new dictionary.\" This matches the control flow of the obfuscated code: iterating over a dictionary of classes, retrieving thresholds from two other dictionaries, applying a helper function to filter each inner dict, and building a result dict. Qwen correctly captures that there are nested dictionaries, that thresholds come from other dictionaries keyed by the outer key, and that the result is a new dictionary of filtered inner dictionaries. However, it omits the domain semantics (classes, students, height, weight), and it also abstracts away the fact that the original problem statement had a list of dictionaries rather than a single nested dictionary (though the provided obfuscated code itself uses a single dict `q2_z7w8`, so Qwen is faithful to the code). It also does not mention that empty results for a class are omitted (the `if s7_k2f:` check). So semantic accuracy is good at the algorithmic level, but completeness is limited because it leaves out domain meaning and some structural nuances from the ground truth.",
+      "transformation_analysis": "The transformation from raw to new in the ground truth is: extend a simple dictionary filter (students → filtered students based on global minima) to a multi-class scenario where you have multiple such dictionaries (one per class), each with its own class-specific minima from separate dictionaries, and you apply the same filtering logic per class and aggregate the results. Qwen's raw and new descriptions are consistent with this evolution: the raw description talks about filtering a single dictionary based on thresholds on the first and second elements; the new description talks about processing a nested dictionary, applying a filtering function to each inner dictionary based on thresholds from other dictionaries, and compiling results. This correctly reflects that the core filtering logic is reused as a helper and applied per inner dictionary, with thresholds coming from external mappings keyed by the outer key. Qwen does not explicitly articulate that the new problem is a generalized/multi-instance version of the raw problem, nor does it mention the per-class semantics, but it clearly recognizes that the new code is a higher-level orchestration around the same filtering function. Thus, its understanding of the transformation is conceptually sound, though somewhat generic and missing domain context.",
+      "obfuscation_handling": "Despite the obfuscated variable names (`b4_m3n5`, `h9_p2r`, `w1_q7t`, `f9_d3t6`, etc.), Qwen correctly inferred the structural semantics: a dictionary comprehension that filters based on two indexed components of the value; a loop over a dictionary of inner dictionaries; retrieving thresholds from two other dictionaries keyed by the same outer key; calling a helper function with those thresholds; and conditionally adding non-empty results to an output dictionary. It did not rely on names to infer meaning, instead describing the operations in neutral terms (\"values (which are lists)\", \"nested dictionary\", \"thresholds retrieved from other dictionaries\"). This indicates strong robustness to obfuscation: it captured the control flow and data flow from the code structure rather than from identifiers. The main omissions are domain-specific semantics (students, classes, height, weight), but those are not recoverable from the obfuscated names alone and are not implied by the code structure, so the lack of that detail is not a failure of robustness to obfuscation.",
+      "strengths": [
+        "Correctly identified that the raw solution filters a dictionary based on two numeric thresholds applied to the first and second elements of each value.",
+        "Recognized the nested-dictionary structure in the new solution and that a helper filtering function is applied to each inner dictionary.",
+        "Captured that thresholds in the new solution are retrieved from separate dictionaries keyed by the outer dictionary's keys.",
+        "Maintained a consistent view of the relationship between raw and new problems: the new code orchestrates repeated application of the same filtering logic.",
+        "Showed strong independence from variable names, focusing on indexing, comparisons, and dictionary operations."
+      ],
+      "weaknesses": [
+        "Did not mention the domain semantics (students, classes, height, weight) present in the ground truth descriptions.",
+        "Described values as \"lists\" instead of tuples, which is slightly imprecise though not semantically critical for the algorithm.",
+        "Did not note that classes with no students meeting the criteria are omitted from the result due to the `if s7_k2f:` check.",
+        "Did not explicitly articulate that the new problem is a multi-instance/generalized version of the raw problem with per-class thresholds.",
+        "Omitted the detail from the ground truth that the original new problem involved a list of dictionaries, though this is not visible in the provided code snippet."
+      ],
+      "key_insights": "Qwen demonstrates a solid grasp of the algorithmic semantics of the obfuscated code: it correctly identifies dictionary filtering based on indexed elements and the orchestration of this filtering over nested dictionaries with thresholds from auxiliary mappings. Its descriptions are generic but accurate at the structural and operational level, indicating that it relies on code logic rather than variable names. The main gap is in mapping that logic back to the original problem domain (students, classes, height, weight), which is not evident from the obfuscated code alone. This suggests that Qwen is strong at structural code understanding under obfuscation but, as expected, does not reconstruct domain-specific narratives without explicit cues."
+    },
+    "computed_overall_score": 3.8333333333333335
+  }
+}

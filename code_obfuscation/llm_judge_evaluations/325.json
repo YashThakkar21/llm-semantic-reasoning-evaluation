@@ -1,0 +1,46 @@
+{
+  "problem_id": 325,
+  "source_files": {
+    "ground_truth": "mbpp_pro/325.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/325.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/325.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find numbers within a given range from startnum ti endnum where every number is divisible by every digit it contains. https://www.w3resource.com/python-exercises/lambda/python-lambda-exercise-24.php",
+    "new_problem": "# Write a function to find the smallest range of numbers from startnum to endnum where every number in the range is divisible by every digit it contains. If no such range exists, return an empty list. The function should take two additional parameters: step and max_attempts. The step parameter defines the increment between startnum and endnum, and max_attempts defines the maximum number of attempts to find such a range. If a valid range is not found within max_attempts, the function should return an empty list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code generates a list of numbers within a specified range where each digit of the number is non-zero and divides the number evenly.",
+    "new_problem": "The code searches for a pair of consecutive numbers within a specified range such that each number in the pair is divisible by all of its non-zero digits."
+  },
+  "judge_evaluation": {
+    "problem_id": 325,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.33,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, Qwen's description matches the ground truth semantics very well. The ground truth: \"find numbers within a given range from startnum to endnum where every number is divisible by every digit it contains.\" The obfuscated code uses a list comprehension over range(x7q_9m, w2_k5p+1) and filters out any number where any digit is 0 or does not divide the number evenly. Qwen's inference: \"generates a list of numbers within a specified range where each digit of the number is non-zero and divides the number evenly.\" This is exactly what the code does. It correctly notes the range behavior and the non-zero digit condition (which is implicit in the original verbal problem but explicit in the implementation). The only minor omission is not explicitly stating inclusivity of the upper bound, but that's a small implementation detail. Hence high semantic accuracy and near-complete coverage of the important aspects.",
+      "new_problem_evaluation": "For the new problem, there is a significant mismatch between the ground truth and Qwen's inference. Ground truth: \"find the smallest range of numbers from startnum to endnum where every number in the range is divisible by every digit it contains\", with parameters step and max_attempts, and behavior about attempts and returning an empty list if no such range is found. The obfuscated new solution code, however, only shows a loop over attempts (range(p9_x4k)), computing m3_t7w = start + attempt*step and f4_y6j = m3_t7w + step, breaking if f4_y6j exceeds end, and then calling divisible_by_digits(m3_t7w, f4_y6j) and returning [m3_t7w, f4_y6j] if that call is truthy. This code actually searches for a pair of numbers (start and start+step) such that some condition over that interval holds; given the helper name, it's likely checking that all numbers in [m3_t7w, f4_y6j] are divisible by their digits. Qwen's description: \"searches for a pair of consecutive numbers within a specified range such that each number in the pair is divisible by all of its non-zero digits.\" This is only partially aligned: it correctly identifies that the function returns a pair of numbers and that the divisibility-by-digits property is central, but it misinterprets them as \"consecutive numbers\" (step is not necessarily 1) and as checking only the two endpoint numbers rather than the entire range between them. It also completely omits the notions of \"smallest range\", the step parameter semantics, and max_attempts as a search limit. It does capture that the output is a pair (a small range) or an empty list, but misses most of the higher-level problem constraints and intent.",
+      "transformation_analysis": "The transformation from raw to new ground-truth problem is: from listing all self-dividing numbers in a range to finding the smallest contiguous subrange [a, b] within [startnum, endnum] such that every number in that subrange is self-dividing, with additional control via step and max_attempts. Conceptually, it moves from a simple filter over a range to a search over subranges with extra parameters and early termination. Qwen's raw problem understanding is accurate, but its new problem description reduces the transformation to: instead of listing all such numbers, now we search for a pair of numbers that themselves satisfy the property. That misses the key idea that the new problem is about a range where *all* numbers satisfy the property, not just the endpoints, and that the search is bounded by max_attempts and parameterized by step. Thus, Qwen did not really capture the nature of the evolution from \"per-number filtering\" to \"range search under constraints\"; it only recognized that the new code returns a pair instead of a list of many numbers. This leads to a low score for transformation understanding.",
+      "obfuscation_handling": "Despite the obfuscated names, Qwen handled the core logic of the raw solution very well, relying on the structure: list comprehension over a range, mapping over string digits, checking for zero digits and divisibility. This shows good robustness to bad naming. For the new solution, it correctly inferred that the function is searching over a range using a loop with a maximum number of attempts, computing candidate start and end points via arithmetic with step, and returning a pair or an empty list. It also correctly recognized that divisibility by digits is still the central predicate. However, it over-simplified the semantics of divisible_by_digits(m3_t7w, f4_y6j) as if it were checking only the two numbers, not the interval, and it assumed \"consecutive numbers\" instead of general step-based spacing. These errors are more about not reasoning beyond the visible snippet and helper name than about being misled by obfuscation. Overall, the model showed good resilience to obfuscated identifiers but did not fully reconstruct the higher-level problem specification from the partial code.",
+      "strengths": [
+        "Accurately captured the semantics of the raw problem: numbers in a range whose non-zero digits all divide the number.",
+        "Correctly identified the divisibility-by-digits property and the exclusion of zero digits from consideration.",
+        "Recognized in the new code that the function returns a pair of numbers or an empty list and that it performs a search over a bounded number of attempts.",
+        "Showed robustness to obfuscated variable names by relying on control flow and operations rather than names."
+      ],
+      "weaknesses": [
+        "For the new problem, misinterpreted the search target as a pair of individual numbers satisfying the property, rather than a range where all numbers satisfy it.",
+        "Assumed the pair are \"consecutive numbers\" instead of being separated by a general step parameter.",
+        "Did not mention or explain the roles of step and max_attempts as conceptual problem parameters, only implicitly reflecting max_attempts via the loop.",
+        "Failed to capture the key notion of \"smallest range\" and the idea of searching over subranges within the larger interval."
+      ],
+      "key_insights": "Qwen demonstrates strong local semantic understanding of concrete code, especially for the raw problem: it can accurately reconstruct the intended behavior of a compact, functional-style expression even when names are meaningless. However, when the problem evolves to a more abstract, higher-level specification involving ranges of numbers, search strategies, and additional parameters, Qwen's description tends to stay close to the immediately visible mechanics (loop, pair return) and under-specifies or mis-specifies the conceptual intent (smallest valid range, all numbers in the range satisfying the property, general step). This suggests that while the model is robust to obfuscation at the level of individual functions and predicates, it can struggle to infer the full problem statement and transformation when key semantics are encapsulated in helper functions (like divisible_by_digits) or implied by the broader problem context rather than explicitly visible in the snippet."
+    },
+    "computed_overall_score": 3.3333333333333335
+  }
+}

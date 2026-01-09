@@ -1,0 +1,47 @@
+{
+  "problem_id": 22,
+  "source_files": {
+    "ground_truth": "mbpp_pro/22.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/22.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/22.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to sort a list of tuples using the second value of each tuple.",
+    "new_problem": "# Given a list of students' records, where each record is a list of tuples representing the student's name and their scores in different subjects, write a function to sort the records by the total score of each student in descending order. If two students have the same total score, sort them by their names in ascending order."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code sorts a list of tuples containing subjects and their marks in ascending order based on the marks.",
+    "new_problem": "The code sorts a list of tuples, where each tuple contains multiple subject-score pairs, primarily by the negative sum of scores (to sort in descending order of total score) and secondarily by the first character of the first subject name."
+  },
+  "judge_evaluation": {
+    "problem_id": 22,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 4.0,
+    "completeness_raw": 5.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 4.0,
+    "robustness_to_obfuscation": 5.0,
+    "overall_score": 4.33,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw: sort a list of tuples by the second value of each tuple. Code: list.sort(key=lambda x: x[1]). Qwen: \"sorts a list of tuples containing subjects and their marks in ascending order based on the marks.\" This is semantically correct: it identifies tuples, the second element as marks, and ascending order. It even adds a plausible domain (subjects/marks) that matches the commented example. No important detail is missing: list of tuples, key is second element, ascending. Hence both semantic accuracy and completeness are maximal for the raw problem.",
+      "new_problem_evaluation": "Ground truth new: each record is a list of (name, score) tuples for a student; we must sort students (records) by total score descending, and break ties by student name ascending. Code: list.sort(key=lambda rec: (-sum(score for _, score in rec), rec[0][0])). Qwen: \"sorts a list of tuples, where each tuple contains multiple subject-score pairs, primarily by the negative sum of scores (to sort in descending order of total score) and secondarily by the first character of the first subject name.\" Semantically, Qwen correctly understands: (1) each outer element is a collection of inner (label, score) pairs, (2) it sums scores, (3) uses negative sum for descending order, and (4) uses a secondary key based on the first element of the first inner pair. However, it misinterprets the domain slightly: it treats the outer elements as tuples instead of (more generally) sequences/records, and more importantly, it describes the secondary key as \"first character of the first subject name\" rather than \"student name\". The ground truth intends the student's name as a separate field, not necessarily the first character of the first subject. The code itself actually uses q[0][0], which is indeed the first character of the first inner string, so Qwen is faithful to the code but not to the dataset-level semantics. It also misses the explicit mention that the outer list represents students' records and that the secondary sort is by full name in ascending order, not just first character. Thus semantic accuracy is high but not perfect (4), and completeness is moderate (3) because it omits the student-record framing and the full-name vs. first-character nuance.",
+      "transformation_analysis": "The transformation from raw to new ground truth is: from sorting a flat list of (name, score) tuples by the score, to sorting a list of student records (each a collection of scores) by total score descending, with a tie-break on student name ascending. Qwen's raw description: sort tuples by marks ascending. New description: sort a list of higher-level tuples (records) by negative sum of scores and then by the first character of the first subject name. It correctly captures the structural evolution: from a simple key on a single element to a composite key involving an aggregate (sum) and a secondary lexicographic criterion. It also correctly notes the descending order via negative sum. What it does not capture is the intended semantic evolution from \"generic tuple sorting\" to \"student records with total scores and names\"; instead, it stays in the \"subject-score pairs\" framing and mislabels the secondary key as subject-name-based rather than student-name-based. Still, its understanding of the algorithmic transformation (single-key to multi-key, ascending to descending via negation, aggregation over inner elements) is strong, justifying a 4.",
+      "obfuscation_handling": "The obfuscation is purely in variable names (e.g., z9y8x7..., q1w2e3..., p0o9i8...), while the structure is clear: list.sort with a lambda key using sum over a comprehension and indexing q[0][0]. Qwen ignores the meaningless names and focuses on the operations: list.sort, lambda, sum over scores, negative for descending, and secondary key via indexing into the first inner tuple and then its first element. For the raw problem, it similarly ignores the nonsense variable name and correctly identifies sorting by the second element. This shows strong robustness to obfuscation: it relies on code structure and Python idioms rather than identifiers. The minor semantic mismatch in the new problem (subject vs student, first character vs full name) is not due to obfuscation but to interpreting the intended problem context vs the literal code behavior.",
+      "strengths": [
+        "Correctly identified that the raw solution sorts by the second element of each tuple in ascending order.",
+        "Accurately recognized in the new solution that sorting is based on the negative sum of scores to achieve descending order.",
+        "Correctly understood the composite key: primary key is total score, secondary key is derived from the first inner element.",
+        "Showed clear reliance on code structure (sort, lambda, sum, indexing) rather than variable names, indicating strong robustness to obfuscation.",
+        "Captured the algorithmic evolution from a simple key sort to a composite, aggregate-based sort."
+      ],
+      "weaknesses": [
+        "For the new problem, did not align with the ground truth semantic framing of \"students' records\" and \"student names\"; instead, it stayed with \"subject-score pairs\".",
+        "Described the secondary key as the first character of the first subject name, which matches the literal code but not the intended tie-break on full student names.",
+        "Did not explicitly mention that the outer list elements represent individual students and that the sort is over students rather than generic tuples.",
+        "Completeness is limited for the new problem: it omits the explicit requirement of sorting by name in ascending order as a conceptual constraint, focusing only on the technical key expression."
+      ],
+      "key_insights": "Qwen demonstrates strong code-level semantic understanding even under obfuscation: it correctly interprets Python sorting idioms, lambda keys, aggregations, and composite keys. Its descriptions are faithful to the actual code behavior, sometimes more so than to the dataset's natural-language intent (e.g., first character of first string vs. full student name). This suggests that when the code and the textual specification diverge slightly, Qwen tends to side with the literal code semantics. For simple tasks (raw problem), it achieves perfect semantic and completeness scores. For more structured tasks (new problem), it captures the core algorithm (descending by total score, secondary lexicographic key) but may miss or reinterpret higher-level domain semantics (students vs subjects, names vs labels). Overall, its robustness to obfuscated naming is excellent; the remaining gaps are about aligning low-level code behavior with higher-level problem narratives."
+    },
+    "computed_overall_score": 4.333333333333333
+  }
+}

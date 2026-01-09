@@ -1,0 +1,46 @@
+{
+  "problem_id": 140,
+  "source_files": {
+    "ground_truth": "mbpp_pro/140.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/140.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/140.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find the nth decagonal number.",
+    "new_problem": "# Given a list of integers, write a function to find the sum of the first 10 decagonal numbers for each integer in the list. If the integer is negative, return 0 for that integer."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates a mathematical expression that computes a specific formula based on the input n.",
+    "new_problem": "The code processes a list of numbers, replacing negative numbers with 0 and non-negative numbers with the sum of a function applied to numbers 1 through 10."
+  },
+  "judge_evaluation": {
+    "problem_id": 140,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 4.0,
+    "completeness_raw": 1.0,
+    "completeness_new": 3.0,
+    "transformation_understanding": 3.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 2.83,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: compute the nth decagonal number (a specific polygonal-number formula). Code: `return 4 * n * n - 3 * n`. Qwen's description: \"calculates a mathematical expression that computes a specific formula based on the input n.\" This is extremely generic and does not identify that the formula corresponds to decagonal numbers or any specific mathematical concept. Semantically, Qwen recognizes that it's a deterministic formula of n, but not what it represents. It also omits input/output type, domain assumptions, and any naming of the mathematical object. Hence low semantic accuracy and very low completeness.",
+      "new_problem_evaluation": "Ground truth: For each integer in a list, if the integer is negative, return 0; otherwise, return the sum of the first 10 decagonal numbers (which depend on that integer via the decagonal-number function). The obfuscated code: iterates over `q8_lst`, for negatives appends 0, otherwise computes `sum(t9_r4_v2(b1_j) for b1_j in range(1, 11))` and appends that. Qwen's description: \"processes a list of numbers, replacing negative numbers with 0 and non-negative numbers with the sum of a function applied to numbers 1 through 10.\" This correctly captures the control flow (per-element processing, negative → 0, non-negative → sum over 1..10 of some function) and the input/output structure (list in, list out). However, it misses the key semantic detail that the function is specifically the decagonal-number function, and that the sum is of the first 10 decagonal numbers. It also doesn't mention that the function applied is independent of the particular non-negative element value (the code ignores `a3_w` when computing the sum), though the ground truth problem statement is also a bit ambiguous on that point. Overall, semantic accuracy is good at the structural level but incomplete on the mathematical meaning.",
+      "transformation_analysis": "The raw problem is \"compute nth decagonal number\"; the new problem is \"for each integer in a list, if negative → 0, else → sum of first 10 decagonal numbers.\" Qwen's raw description is generic and does not identify decagonal numbers, so it cannot explicitly connect that the new problem is aggregating the base function over 1..10. For the new problem, Qwen does recognize that the new code applies \"a function\" to numbers 1 through 10 and sums the results, and that this is conditioned on sign of each list element. This implicitly reflects the transformation pattern: from a scalar function f(n) to a list-processing function that, for each element, either returns 0 or sum_{i=1..10} f(i). However, because Qwen never names or characterizes f as the decagonal-number function, it only partially captures the conceptual evolution from raw to new problem. Thus, the understanding of the transformation is structurally correct but semantically shallow.",
+      "obfuscation_handling": "The obfuscation is mainly in variable and function names (`q8_lst`, `a3_w`, `t9_r4_v2`, etc.), but the control flow and operations are clear. Qwen correctly infers that the code iterates over a list, checks negativity, and for non-negative values computes a sum of a function over the range 1 to 10. This shows that Qwen relied on the code structure (for-loop, condition, range, sum) rather than on names, which is robust to obfuscation. Similarly, for the raw solution, Qwen recognized that the code computes a formula in n, though it did not identify the specific mathematical object. The failure to mention \"decagonal\" is not due to obfuscation of names (there were no helpful names in the raw snippet anyway) but due to not mapping the formula to a known sequence. So robustness to obfuscation is relatively strong: Qwen extracted the correct high-level behavior despite meaningless identifiers.",
+      "strengths": [
+        "Correctly identified that the raw code computes a deterministic mathematical expression in n.",
+        "Accurately described the new code's list-processing behavior: per-element handling, negative → 0, non-negative → sum over 1..10.",
+        "Recognized the pattern of applying an inner function over a fixed range and summing the results.",
+        "Did not rely on variable or function names; instead used control-flow and built-in functions to infer behavior."
+      ],
+      "weaknesses": [
+        "Failed to identify that the formula `4 * n * n - 3 * n` corresponds to the nth decagonal number.",
+        "Did not mention decagonal numbers or any specific mathematical sequence in either raw or new problem descriptions.",
+        "New problem description omits the key semantic that the summed function is the decagonal-number function, reducing completeness.",
+        "Transformation understanding remains at a structural level (\"some function\" over 1..10) without connecting it back to the original decagonal-number computation."
+      ],
+      "key_insights": "Qwen demonstrates solid structural understanding of the code, especially for the new problem: it correctly interprets loops, conditionals, and aggregation patterns despite heavily obfuscated identifiers. However, it does not map the underlying arithmetic formula to its mathematical meaning (decagonal numbers), leading to generic descriptions. This suggests that Qwen is strong at control-flow and data-flow reasoning under obfuscation, but weaker at recognizing specific mathematical sequences or domain semantics from formulas alone. As a result, its understanding of the transformation from the base scalar function to the list-based aggregation is structurally accurate but semantically incomplete."
+    },
+    "computed_overall_score": 2.8333333333333335
+  }
+}

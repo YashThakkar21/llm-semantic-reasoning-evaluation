@@ -1,0 +1,46 @@
+{
+  "problem_id": 14,
+  "source_files": {
+    "ground_truth": "mbpp_pro/14.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/14.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/14.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to check if the given number is woodball or not.",
+    "new_problem": "# Write a function to find the first 10 woodall numbers in a given range of integers. A woodall number is defined as a number of the form W(n) = n * 2^n - 1. The function should return a list of the first 10 woodall numbers found within the given range, or an empty list if no such numbers exist within the range."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code checks if a given integer is a specific type of number, likely a Fermat prime, by ensuring it's odd, greater than 1, and passes a modified Lucas-Lehmer test.",
+    "new_problem": "The code appends numbers that satisfy a condition defined by function `b8k_4vp` to a list `n2_wr5t` until the list contains 10 such numbers, then returns the list."
+  },
+  "judge_evaluation": {
+    "problem_id": 14,
+    "semantic_accuracy_raw": 1.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 1.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 2.0,
+    "overall_score": 1.83,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: check if a number is a Woodall number (of the form n*2^n - 1). The obfuscated raw code actually implements a very different and somewhat odd test: it checks integer type, positivity, oddness, returns True for 1, then increments the number, repeatedly divides by 2 while even, counting how many times, and returns True only if the count of divisions equals the resulting value. This is not a standard Woodall test, but the intended semantics from the dataset is 'woodball/woodall number check'. Qwen's inference: 'checks if a given integer is a specific type of number, likely a Fermat prime, by ensuring it's odd, greater than 1, and passes a modified Lucas-Lehmer test.' This is semantically incorrect relative to the ground truth: Woodall numbers are not primes in general, and the code is not implementing a Lucas–Lehmer-like test. Qwen also says 'greater than 1', whereas the code explicitly treats 1 as a valid case. So it misidentifies both the class of numbers and the nature of the algorithm. It only correctly notes that the function is a predicate on integers for a special numeric property, which is extremely generic. Hence very low semantic accuracy and completeness for the raw problem.",
+      "new_problem_evaluation": "Ground truth new problem: 'find the first 10 Woodall numbers in a given range of integers' and return them as a list, or an empty list if none. The obfuscated new solution snippet shows: for each a3f_9x in some loop (not shown), if b8k_4vp(a3f_9x) is True, append to n2_wr5t; stop when 10 such numbers are collected; return the list. Qwen's inference: 'The code appends numbers that satisfy a condition defined by function b8k_4vp to a list n2_wr5t until the list contains 10 such numbers, then returns the list.' This correctly captures the control logic (filtering by a predicate, collecting until 10, then returning), but it does not identify that the predicate is specifically testing for Woodall numbers, nor does it mention the input range or the possibility of returning fewer than 10 if the range is exhausted. It also omits the 'within a given range' aspect entirely. So the semantic accuracy is moderate (the high-level behavior of collecting 10 qualifying numbers is right), but completeness is low because it misses the Woodall concept and range constraints.",
+      "transformation_analysis": "The transformation from raw to new in the ground truth is: from a single-number predicate 'is this integer a Woodall number?' to a range-based search 'find the first 10 Woodall numbers in a given range using that predicate'. Qwen's raw-problem inference mislabels the predicate as a Fermat-prime/Lucas–Lehmer-like test, so it fundamentally misunderstands what the base property is. For the new problem, Qwen correctly recognizes that the new code repeatedly applies the predicate b8k_4vp and collects up to 10 matches. However, it does not explicitly connect this to the earlier predicate (as 'the same property as before, now used in a search over a range'), nor does it articulate the evolution from single-value check to range-based enumeration of the first 10 such numbers. Because the core property is misidentified in the raw problem and not named in the new problem, the understanding of the transformation is weak: Qwen sees 'some predicate' → 'collect 10 numbers satisfying that predicate', but not 'woodall check' → 'first 10 woodall numbers in range'.",
+      "obfuscation_handling": "The obfuscation is mainly in variable/function names (a3f_9x, q7_z2m, b8k_4vp, n2_wr5t). For the new solution, Qwen correctly ignored the meaningless names and focused on structure: a predicate function call inside a loop, appending to a list, breaking at length 10. That shows some robustness to obfuscation at the control-flow level. However, for the raw solution, Qwen over-interpreted the arithmetic pattern and incorrectly mapped it to a known prime-testing scheme (Fermat prime / Lucas–Lehmer) despite the code not matching those algorithms. It did not infer the intended Woodall semantics, but to be fair, the raw code as shown does not literally implement the standard Woodall test either, so Qwen had little semantic anchor beyond 'some special-number predicate'. Overall, Qwen handled the obfuscated names reasonably (it did not rely on them), but its semantic inference from the arithmetic structure was poor and speculative, leading to a wrong classification of the number type.",
+      "strengths": [
+        "Correctly identified that the raw function is a boolean predicate on integers for some special numeric property.",
+        "Accurately described the control-flow pattern in the new solution: applying a predicate, appending matches to a list, stopping when 10 matches are found, and returning the list.",
+        "Did not rely on obfuscated variable names; instead, it focused on the structural behavior of the code."
+      ],
+      "weaknesses": [
+        "Misidentified the type of number in the raw problem as related to Fermat primes and Lucas–Lehmer testing, which is unrelated to Woodall numbers and not supported by the code.",
+        "Incorrectly stated that the number must be greater than 1, while the code explicitly treats 1 as a valid case.",
+        "Failed to mention Woodall numbers or their defining formula n*2^n - 1 anywhere, missing the core semantic target of the problem.",
+        "For the new problem, omitted key details: that the numbers are searched within a given range, that the predicate is specifically the woodall/woodball test, and that the function may return fewer than 10 numbers if the range does not contain enough matches.",
+        "Did not clearly articulate the conceptual transformation from 'single-number property test' to 'enumerate the first 10 numbers with that property in a range'."
+      ],
+      "key_insights": "Qwen shows that it can reliably extract high-level control-flow semantics from obfuscated code (e.g., 'filter by predicate until 10 matches') without depending on variable names. However, when the numeric logic is non-standard or not clearly tied to a well-known pattern, it tends to guess a familiar concept (here, Fermat primes / Lucas–Lehmer) rather than admit uncertainty, leading to incorrect semantic labeling. This behavior results in a large mismatch with the ground truth concept of Woodall numbers and weak understanding of the raw→new transformation, even though the structural understanding of the new code is mostly correct."
+    },
+    "computed_overall_score": 1.8333333333333333
+  }
+}

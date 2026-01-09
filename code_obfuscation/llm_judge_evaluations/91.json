@@ -1,0 +1,46 @@
+{
+  "problem_id": 91,
+  "source_files": {
+    "ground_truth": "mbpp_pro/91.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/91.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/91.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function that counts the number of pairs of integers in a list that xor to an even number.",
+    "new_problem": "# Given a list of lists of integers, write a function that counts the number of pairs of integers across all sublists that xor to an even number."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates the number of pairs in the list `g7hK_2x` where the bitwise XOR of the pair is even.",
+    "new_problem": "The code computes the sum of the results of applying the function `j3_nR8x` to each element in the list `m2_kD6v`."
+  },
+  "judge_evaluation": {
+    "problem_id": 91,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 5.0,
+    "completeness_new": 1.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.17,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, Qwen's description matches the ground truth very closely. The ground truth: \"counts the number of pairs of integers in a list that xor to an even number.\" Qwen: \"calculates the number of pairs in the list `g7hK_2x` where the bitwise XOR of the pair is even.\" This captures:\n- The input type (a list)\n- The operation (bitwise XOR)\n- The condition (XOR result is even)\n- The output (a count of such pairs)\nIt also implicitly respects the pair enumeration logic in the code (using enumerate and slicing to avoid double-counting and self-pairs), which is exactly what \"number of pairs\" means in the original problem. There are no semantic inaccuracies or missing details relevant to the problem statement level.",
+      "new_problem_evaluation": "For the new problem, the ground truth says: \"Given a list of lists of integers, write a function that counts the number of pairs of integers across all sublists that xor to an even number.\" The obfuscated new solution is:\n```python\nreturn sum(j3_nR8x(q5_uY9w) for q5_uY9w in m2_kD6v)\n```\nGiven the pattern of this dataset, `m2_kD6v` is the outer list (list of sublists), and `j3_nR8x` is almost certainly the raw-problem function applied to each sublist, returning the count of even-XOR pairs within that sublist. Summing over all sublists yields the total number of such pairs across all sublists.\n\nQwen's description: \"The code computes the sum of the results of applying the function `j3_nR8x` to each element in the list `m2_kD6v`.\" This is only a structural description of the higher-order call pattern. It does not mention:\n- That `m2_kD6v` is a list of lists of integers\n- That `j3_nR8x` counts pairs of integers whose XOR is even\n- That the final result is the total count of such pairs across all sublists\nSo while Qwen correctly describes the syntactic pattern (map-then-sum), it fails to connect this to the underlying semantic task described in the ground truth. Hence low semantic accuracy and very low completeness for the new problem.",
+      "transformation_analysis": "The transformation from raw to new problem is: lift the original function (count even-XOR pairs in a single list) to operate over a list of lists by applying it to each sublist and summing the results. Conceptually: `total = sum(f(sublist) for sublist in list_of_lists)` where `f` is the raw-problem solution.\n\nQwen's new-problem description only states that the code \"computes the sum of the results of applying the function `j3_nR8x` to each element in the list `m2_kD6v`.\" This shows that Qwen recognized the higher-order pattern (a sum over function applications) but did not articulate how this relates to the original problem semantics (counting even-XOR pairs) or to the change in input type (from list of ints to list of lists of ints). There is no explicit recognition that `j3_nR8x` is the raw-problem function or that the transformation is a straightforward aggregation over sublists.\n\nThus, Qwen partially understands the structural transformation (function application and summation) but not the semantic transformation (extending the original counting task across sublists).",
+      "obfuscation_handling": "In the raw solution, variable names like `g7hK_2x`, `z9_mQ`, `p4_wL` are meaningless, yet Qwen correctly inferred that the code is counting pairs whose XOR is even. This indicates that Qwen relied on the control structure and operations:\n- `enumerate(g7hK_2x)` and `g7hK_2x[v8_rT + 1:]` to see it's iterating over unordered pairs without repetition\n- `(z9_mQ ^ p4_wL) % 2 == 0` to see it's checking for even XOR\n- `sum(...)` over a boolean generator to see it's counting such pairs\nThis is strong robustness to obfuscation for the raw problem.\n\nFor the new solution, Qwen again ignored obfuscated names and correctly described the high-level pattern `sum(j3_nR8x(q5_uY9w) for q5_uY9w in m2_kD6v)`. However, it did not connect `j3_nR8x` back to the previously inferred semantics (even-XOR pair counting), even though that is strongly suggested by the context. So while Qwen handled the obfuscation of identifiers well at the syntactic level, it did not fully propagate semantic understanding from the raw function to its use in the new solution.",
+      "strengths": [
+        "Accurately identified the core semantics of the raw function: counting pairs whose XOR is even.",
+        "Correctly interpreted the pair-generation pattern using enumerate and slicing, despite obfuscated variable names.",
+        "Recognized the higher-order pattern in the new solution: summing the results of applying a function to each element of a list.",
+        "Demonstrated reliance on code structure and operations rather than identifier names for the raw problem."
+      ],
+      "weaknesses": [
+        "For the new problem, failed to mention that the input is a list of lists of integers.",
+        "Did not connect `j3_nR8x` in the new solution to the previously inferred raw-problem semantics (even-XOR pair counting).",
+        "Did not state that the final result is the total number of even-XOR pairs across all sublists.",
+        "Transformation understanding remained at a syntactic level (sum of function applications) rather than a semantic level (lifting the original counting task to nested lists)."
+      ],
+      "key_insights": "Qwen shows strong capability to extract semantic meaning from obfuscated code when working directly with the core algorithm (raw problem). It correctly interprets pair enumeration and bitwise conditions without relying on variable names. However, when the code composes previously defined functionality (the new problem), Qwen tends to describe only the immediate higher-order structure (\"sum of function applications\") and does not always propagate or reapply the deeper semantic understanding of the called function. This suggests that while Qwen is robust to obfuscation at the local function level, its integration of semantic knowledge across multiple related snippets (e.g., recognizing that `j3_nR8x` is the even-XOR pair counter) is weaker, leading to under-specified or purely structural descriptions for composed problems."
+    },
+    "computed_overall_score": 3.1666666666666665
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "problem_id": 250,
+  "source_files": {
+    "ground_truth": "mbpp_pro/250.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/250.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/250.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to interleave 3 lists of the same length into a single flat list.",
+    "new_problem": "# Given a list of lists where each sublist contains exactly 3 elements, write a function to interleave all the sublists into a single flat list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet flattens a list of tuples by iterating over them and collecting all elements into a single list.",
+    "new_problem": "The code snippet processes a list of lists, applying a function to each sublist's first three elements and extending a result list with the output."
+  },
+  "judge_evaluation": {
+    "problem_id": 250,
+    "semantic_accuracy_raw": 4.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 3.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.67,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw: interleave 3 lists of the same length into a single flat list. Code: `[o9_o for _oo00o in zip(l1i_i, i1l_l, ll1_1) for o9_o in _oo00o]` which zips three lists and flattens each 3-tuple, effectively interleaving them. Qwen's description: 'flattens a list of tuples by iterating over them and collecting all elements into a single list.' Semantically, this is mostly correct: the core operation is flattening the sequence of tuples produced by zip. However, Qwen omits the fact that the input is specifically three separate lists of equal length and that the tuples come from zipping those three lists. So the high-level behavior (flattening tuples into a list) is right, but the more specific semantics (interleaving three lists) are not captured. Hence good semantic accuracy but only moderate completeness.",
+      "new_problem_evaluation": "Ground truth new: given a list of lists where each sublist has exactly 3 elements, interleave all sublists into a single flat list. The obfuscated code: it iterates over `ll1i_1i` (list of sublists), and for each sublist `o0o_0o` it calls `i1l1_l1(o0o_0o[:1], o0o_0o[1:2], o0o_0o[2:3])` and extends the result list with that output. From the original problem pair, `i1l1_l1` is clearly the earlier interleaving function that takes three lists and interleaves them. Here, each slice `o0o_0o[:1]`, etc., is a length-1 list containing each element, so the call interleaves those three one-element lists, effectively just returning the three elements in order, and the outer loop concatenates these across all sublists. So overall, the function flattens a list of 3-element sublists. Qwen's description: 'processes a list of lists, applying a function to each sublist's first three elements and extending a result list with the output.' This is vague and misses the key semantics: that the function is specifically an interleaving/flattening of those three elements and that each sublist is exactly length 3. It also doesn't state that the overall effect is a single flat list of all elements. So semantic accuracy is low-to-moderate (it notes list of lists and first three elements, but not the actual purpose), and completeness is low.",
+      "transformation_analysis": "Ground truth transformation: raw problem is interleaving three separate lists; new problem wraps this by taking a list of 3-element sublists and applying the same interleaving logic to each sublist, effectively flattening the entire structure. The relationship is that the new problem reuses the original interleaving function on each sublist, turning a '3 lists' interface into a 'list of triplets' interface. Qwen's raw description focuses on 'flattening a list of tuples', and the new description focuses on 'applying a function to each sublist's first three elements'. It does not explicitly recognize that the same interleaving/flattening logic is being reused, nor that the new problem is a structured generalization of the original. The connection between the two problems (and that the inner function is the original one) is not articulated. Thus, understanding of the transformation is weak.",
+      "obfuscation_handling": "Despite obfuscated names, Qwen correctly inferred the core behavior of the raw solution: iterating over tuples (from zip) and flattening them into a list. That shows it relied on the comprehension structure rather than names. For the new solution, it recognized that there is a list of lists and that a function is applied to slices of each sublist, but it did not infer the more precise semantics that this is just reusing the interleaving/flattening logic to produce a single flat list. The obfuscation of the helper function name (`i1l1_l1`) and the use of slicing (`[:1]`, etc.) likely obscured that this is just wrapping the original interleaving function. So robustness is moderate: Qwen handled the simple comprehension well but struggled to connect the obfuscated helper function and its role in the higher-level transformation.",
+      "strengths": [
+        "Correctly identified that the raw code flattens tuples into a single list, which is the essential effect of interleaving three lists via zip.",
+        "Recognized in the new code that the input is a list of lists and that a function is applied to the first three elements of each sublist, with results accumulated into a result list.",
+        "Did not rely on variable names; instead, it used the structural patterns (zip, nested comprehension, extend in a loop) to infer behavior."
+      ],
+      "weaknesses": [
+        "Missed the specific interpretation of the raw problem as 'interleaving three lists of equal length' rather than just flattening tuples.",
+        "For the new problem, failed to state that each sublist has exactly three elements and that the overall effect is to produce a single flat list of all elements.",
+        "Did not recognize or articulate that the function used in the new solution is the same core interleaving logic from the raw solution, so the relationship between raw and new problems was not captured.",
+        "The new problem description is too generic ('applying a function') and does not capture the concrete semantics of that function (interleaving/flattening)."
+      ],
+      "key_insights": "Qwen shows that it can parse and semantically interpret simple structural patterns like zipping and nested comprehensions even when names are obfuscated, yielding a mostly correct high-level description for the raw code. However, when the semantics depend on recognizing reuse of a helper function across two problem variants, especially with additional indirection (slicing into length-1 lists and passing them to an obfuscated helper), Qwen's understanding becomes vague and loses the precise problem intent. This suggests that while Qwen is reasonably robust to obfuscation at the level of local code patterns, it has difficulty tracking and re-identifying higher-level abstractions (like 'this helper is the interleaving function from before') across related code snippets, which is crucial for accurately describing problem transformations."
+    },
+    "computed_overall_score": 2.6666666666666665
+  }
+}

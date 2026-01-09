@@ -1,0 +1,45 @@
+{
+  "problem_id": 234,
+  "source_files": {
+    "ground_truth": "mbpp_pro/234.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/234.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/234.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to toggle the case of all characters in a string.",
+    "new_problem": "# Given a list of strings, write a function to toggle the case of all characters in each string and then concatenate the results into a single string, with each toggled string separated by a space."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet calls a method named 'w4z8p3c5s1' on an object 'x7q2_9m' and returns its result.",
+    "new_problem": "The code snippet processes a list 'v8_p1z7s' by applying a function 'b9_k4x2m' to each element, then joins the results into a single string separated by spaces and returns it."
+  },
+  "judge_evaluation": {
+    "problem_id": 234,
+    "semantic_accuracy_raw": 1.0,
+    "semantic_accuracy_new": 4.0,
+    "completeness_raw": 1.0,
+    "completeness_new": 4.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.5,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: toggle the case of all characters in a string. Ground truth raw solution (non-obfuscated) would be something like calling a method that toggles case on a string input.\n\nObfuscated raw solution: `return x7q2_9m.w4z8p3c5s1()`.\n\nQwen's inferred raw problem: \"The code snippet calls a method named 'w4z8p3c5s1' on an object 'x7q2_9m' and returns its result.\"\n\nQwen only described the surface syntax of the obfuscated code and did not infer the underlying semantic intent (case toggling). It treated `w4z8p3c5s1` as an opaque method rather than recognizing that, in the original problem, this corresponds to a case-toggle operation on a string. As a result, it completely missed the core purpose (case toggling), the nature of the input (a string), and the intended behavior (character-wise case inversion). Hence semantic accuracy and completeness for the raw problem are both minimal.",
+      "new_problem_evaluation": "Ground truth new problem: Given a list of strings, toggle the case of all characters in each string and then concatenate the results into a single string, with each toggled string separated by a space.\n\nObfuscated new solution:\n```python\nreturn ' '.join([b9_k4x2m(r5_3q) for r5_3q in v8_p1z7s])\n```\nThis clearly maps to: for each element in `v8_p1z7s` (a list), apply `b9_k4x2m` (the case-toggling function from the raw problem) and join the results with spaces.\n\nQwen's inferred new problem: \"The code snippet processes a list 'v8_p1z7s' by applying a function 'b9_k4x2m' to each element, then joins the results into a single string separated by spaces and returns it.\"\n\nHere Qwen correctly captured the structural semantics of the code: iterating over a list, applying a function to each element, and joining with spaces. It did not identify that `b9_k4x2m` specifically toggles case, but given only the obfuscated snippet, that semantic is not directly visible. Relative to the ground truth, Qwen missed the specific operation (case toggling) and the fact that the list elements are strings, but it accurately described the mapping-and-join pattern and the final output format. Thus semantic accuracy is high for the new problem in terms of code behavior, but not perfect relative to the original natural-language spec, and completeness is similarly high but not full because the nature of the transformation (case toggle) is omitted.",
+      "transformation_analysis": "The ground truth transformation from raw to new problem is: extend a single-string case-toggle function to operate over a list of strings, applying the same toggle to each element and concatenating the results with spaces.\n\nQwen's raw inference: generic method call on an object, with no semantic description of what the method does.\nQwen's new inference: map a function over a list and join the results with spaces.\n\nQwen did recognize that the new code introduces list processing and string joining, which aligns with the ground truth extension from single input to multiple inputs plus concatenation. However, because it failed to identify the semantic operation in the raw problem, it could not explicitly relate the two as \"the same transformation (case toggling) now applied element-wise.\" The relationship it implicitly captures is only structural: from a single function call to mapping a function over a list and joining.\n\nTherefore, its understanding of the transformation is partial: it sees the higher-order pattern (per-element processing + join) but not the continuity of the underlying operation (case toggle) from raw to new.",
+      "obfuscation_handling": "The obfuscation replaced meaningful names with random identifiers. In the raw snippet, there is almost no structural information beyond \"call a method on an object\"; Qwen defaulted to a purely syntactic description and did not attempt to infer any plausible semantics (like string case operations). This shows a strong reliance on naming or explicit operations for semantic inference; when both are absent, it falls back to a trivial description.\n\nIn the new snippet, the structure is richer: list comprehension, function application, and string join. Qwen successfully ignored the meaningless names and correctly inferred the high-level behavior: process each element of a list with a function and join with spaces. This indicates that when the control-flow and data-flow patterns are informative, Qwen can abstract away from obfuscated identifiers and describe the algorithmic pattern.\n\nHowever, it did not connect `b9_k4x2m` back to the raw method `w4z8p3c5s1` as representing the same logical operation, nor did it infer the specific nature of that operation (case toggling). So its robustness to obfuscation is moderate: good at structural understanding, weak at recovering deeper semantics when names give no hints.",
+      "strengths": [
+        "Accurately described the structural behavior of the new solution: mapping a function over a list and joining results with spaces.",
+        "Successfully ignored meaningless variable and function names in the new code and focused on control-flow and data-flow patterns.",
+        "Captured the correct input-output pattern for the new problem (list in, single space-separated string out)."
+      ],
+      "weaknesses": [
+        "Failed to infer any semantic intent for the raw problem beyond a trivial method call description.",
+        "Did not identify that the underlying operation in both raw and new problems is case toggling on strings.",
+        "Did not explicitly relate the raw and new problems as applying the same transformation first to a single string, then to a list of strings.",
+        "Relied heavily on explicit structure; when structure was minimal (raw snippet), it did not attempt deeper semantic inference."
+      ],
+      "key_insights": "Qwen shows a clear distinction between syntactic and structural understanding. When the code structure is informative (list comprehension, join), it can abstract away from obfuscated names and correctly describe the algorithmic pattern and I/O behavior. However, when the snippet is too minimal and the semantics are encoded only in an opaque method name (as in the raw problem), Qwen does not attempt to infer or hypothesize the underlying operation and instead gives a purely syntactic description. This leads to a disconnect between the raw and new problem descriptions: Qwen understands that the new code maps a function over a list and joins results, but it does not recognize that this function is the same semantic operation as in the raw problem (case toggling). Overall, Qwen is robust to obfuscation at the level of control-flow and data-flow patterns but weak at recovering specific domain semantics when those are not explicitly visible in the code."
+    },
+    "computed_overall_score": 2.5
+  }
+}

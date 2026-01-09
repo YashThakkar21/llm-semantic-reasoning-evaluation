@@ -1,0 +1,45 @@
+{
+  "problem_id": 107,
+  "source_files": {
+    "ground_truth": "mbpp_pro/107.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/107.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/107.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function that takes in a list of tuples and returns a dictionary mapping each unique tuple to the number of times it occurs in the list.\nfrom collections import Counter",
+    "new_problem": "# Given a list of lists of tuples, write a function that returns a dictionary mapping each unique tuple to the total number of times it occurs across all sublists. Each sublist represents a different set of tuples, and tuples within a sublist are considered unique.\nfrom collections import Counter"
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet counts the frequency of each unique tuple formed by sorting the elements of tuples in the list `q3z_l1st`.",
+    "new_problem": "The code snippet counts the frequency of each unique tuple formed by sorting the elements of tuples in the list `m2p_0fx`, using a helper function `u9l_4kp` to process each tuple before counting."
+  },
+  "judge_evaluation": {
+    "problem_id": 107,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.17,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: count occurrences of each tuple exactly as given in the list. Obfuscated code: `Counter(tuple(sorted(t7x)) for t7x in q3z_l1st)` actually counts occurrences of *sorted* versions of the tuples, i.e., it treats (1,2) and (2,1) as the same key. Qwen describes: \"counts the frequency of each unique tuple formed by sorting the elements of tuples in the list `q3z_l1st`\". This matches the obfuscated code's behavior, but not the original ground-truth problem. So Qwen is semantically accurate with respect to the provided code, but not with respect to the intended (ground truth) task. Relative to the ground truth description, Qwen introduces an extra transformation (sorting) that changes the semantics: tuples are no longer treated as distinct by order. It also omits explicitly stating that the input is a list of tuples and the output is a dictionary mapping tuples to counts, though that is implied. Hence low semantic accuracy and completeness versus the ground truth problem.",
+      "new_problem_evaluation": "Ground truth new problem: input is a list of lists of tuples; we must count total occurrences of each tuple across all sublists, with the nuance that \"tuples within a sublist are considered unique\" (i.e., each sublist is a separate set, but globally we still sum counts). The provided obfuscated new solution is inconsistent: it first shows the same one-line function as the raw solution, then defines `f8k_9wz` that iterates over `m2p_0fx`, calls `u9l_4kp` on each sublist, and updates a Counter. We are not shown `u9l_4kp`, but the ground truth says it should aggregate counts across sublists. Qwen's description: \"counts the frequency of each unique tuple formed by sorting the elements of tuples in the list `m2p_0fx`, using a helper function `u9l_4kp` to process each tuple before counting.\" This misses the crucial structural change: the input is now a list of lists (sublists) of tuples, not a flat list. It also again adds the \"sorting elements of tuples\" behavior, which is not stated in the ground truth and is only partially inferable from the snippet (we don't see inside `u9l_4kp`). Qwen does notice a helper function is involved but mischaracterizes the input shape and the overall task (cross-sublists aggregation). As a result, semantic accuracy and completeness versus the ground truth new problem are both low.",
+      "transformation_analysis": "Ground truth transformation: from counting tuples in a single flat list to counting tuples across multiple sublists (list of lists), aggregating counts globally while each sublist represents a separate set. The key evolution is in input structure (list → list of lists) and aggregation across sublists. Qwen's transformation narrative: both raw and new problems are described as counting frequencies of sorted tuples in a single list, with the new version just adding a helper function `u9l_4kp` to process each tuple before counting. This misses the central conceptual transformation (introduction of sublists and cross-sublists aggregation) and instead focuses on an implementation detail (helper function). Thus, Qwen does not correctly capture how the problem evolved; it treats the new problem as essentially the same as the old one with a refactor, rather than a structural change in the input and counting scope.",
+      "obfuscation_handling": "Despite obfuscated names, Qwen correctly identified that the core operation in the raw snippet is counting frequencies of transformed tuples using `Counter` and that the result is a mapping from tuples to counts. It also recognized that `f8k_9wz` uses a helper `u9l_4kp` and a `Counter` to accumulate results over an iterable `m2p_0fx`. However, Qwen appears to overfit to the visible `sorted` call in the raw snippet and projects that behavior into the new problem description, even where the ground truth does not require sorting and the new helper's internals are not shown. It also did not infer the higher-level structural change (list of lists) from the loop over `m2p_0fx` and the update pattern, instead describing `m2p_0fx` as just a list of tuples. This suggests that while Qwen can follow basic control flow and library usage under obfuscation, it struggles to reconstruct the intended higher-level problem when the code is partial or when variable naming does not hint at structure.",
+      "strengths": [
+        "Correctly recognized the use of Counter to produce a frequency mapping from tuples (or transformed tuples) to counts.",
+        "Identified that a helper function `u9l_4kp` is used in the new solution to preprocess data before updating the Counter.",
+        "Did not rely on variable names to understand that the code is performing a counting/aggregation task."
+      ],
+      "weaknesses": [
+        "Misaligned with the ground truth semantics by insisting on sorting tuple elements, which changes the notion of uniqueness compared to the original problem.",
+        "Failed to recognize that the new problem involves a list of lists (sublists) and aggregation across sublists, instead treating the input as a flat list.",
+        "Did not capture the key conceptual transformation from single-list counting to cross-sublists counting; reduced it to a refactor with a helper function.",
+        "Assumed behavior of the helper function `u9l_4kp` (sorting tuples) without evidence and projected that assumption into the problem description."
+      ],
+      "key_insights": "Qwen can track low-level operations like using Counter, iterating, and updating counts even when names are obfuscated, indicating some robustness to naming noise. However, it tends to overinterpret visible transformations (like sorting) and treat them as central to the problem, even when the ground truth problem statement does not include them. More importantly, it struggles to infer higher-level structural changes in the problem (such as moving from a flat list to a list of lists and aggregating across sublists) when the code is partial or when helper functions hide key logic. This leads to descriptions that are locally consistent with the visible code but globally misaligned with the intended problem specification and its evolution."
+    },
+    "computed_overall_score": 2.1666666666666665
+  }
+}

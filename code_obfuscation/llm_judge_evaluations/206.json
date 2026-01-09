@@ -1,0 +1,46 @@
+{
+  "problem_id": 206,
+  "source_files": {
+    "ground_truth": "mbpp_pro/206.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/206.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/206.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to calculate the sum of perrin numbers.",
+    "new_problem": "# Write a function to calculate the sum of perrin numbers for multiple ranges. Given a list of tuples where each tuple contains two integers representing the start and end of a range (inclusive), calculate the sum of perrin numbers for each range and return the total sum of these sums."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates a custom sequence sum where the first three terms are predefined, and subsequent terms are the sum of the previous three terms, returning the sum of the sequence up to the nth term.",
+    "new_problem": "The code calculates the total sum of values over multiple ranges by utilizing a helper function `cal_sum` to compute the cumulative sum up to a given endpoint, adjusting for overlapping ranges."
+  },
+  "judge_evaluation": {
+    "problem_id": 206,
+    "semantic_accuracy_raw": 3.0,
+    "semantic_accuracy_new": 5.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 4.0,
+    "transformation_understanding": 4.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.67,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth: compute the sum of Perrin numbers (a specific, known integer sequence). The obfuscated code actually implements a linear recurrence with first three terms 3, 0, 2 and then each new term is the sum of the previous three, and returns the cumulative sum of terms up to n. Qwen describes it as: \"first three terms are predefined, and subsequent terms are the sum of the previous three terms, returning the sum of the sequence up to the nth term.\" This matches the implemented recurrence and the summation behavior very well, but it does not identify that this is meant to be the Perrin sequence (and in fact, the implemented recurrence does not match the standard Perrin definition). So semantically, relative to the *code*, Qwen is accurate, but relative to the *ground truth problem statement* it misses the Perrin-specific aspect. It captures the core purpose (sum of a 3-term linear recurrence sequence up to n) and the input/output behavior, but omits the named sequence and any domain context. Hence medium semantic accuracy and low completeness versus the ground truth description.",
+      "new_problem_evaluation": "Ground truth new problem: given multiple (start, end) ranges, compute the sum of Perrin numbers over each range and then return the total of these range-sums. The obfuscated new solution loops over ranges and uses cal_sum(end) - cal_sum(start-1) (with a start>0 guard) to get the sum over each range, accumulating into a total. Qwen's description: \"calculates the total sum of values over multiple ranges by utilizing a helper function `cal_sum` to compute the cumulative sum up to a given endpoint, adjusting for overlapping ranges.\" This is essentially correct: it recognizes multiple ranges, a helper that returns a prefix sum, and the use of inclusion–exclusion (end minus start-1) to get range sums, then totals them. It again omits that the underlying values are Perrin numbers, but otherwise captures the behavior and algorithm. Completeness is high for the structural/algorithmic aspects (ranges, prefix sums, total), but it misses the Perrin-specific nature of the sequence.",
+      "transformation_analysis": "The raw→new transformation in the ground truth is: from summing Perrin numbers up to n (single range starting at 0) to handling multiple arbitrary ranges and summing their Perrin sums into a grand total. Qwen's raw description: \"sum of the sequence up to the nth term\"; new description: \"total sum of values over multiple ranges\" using a helper that computes cumulative sums. This reflects a correct understanding of the conceptual evolution: first, a function that returns a prefix sum of a sequence; then, a wrapper that uses that prefix-sum function to support arbitrary ranges and aggregate them. Qwen does not explicitly articulate that the same underlying sequence is being reused, nor that the new problem generalizes the original single-range case, but its descriptions are consistent with that relationship. It also slightly mischaracterizes the range logic as \"adjusting for overlapping ranges\" (the code does not handle overlaps specially; it just sums each range independently), but this is a minor wording issue rather than a misunderstanding of the computation. Overall, it shows a good grasp of the transformation pattern (prefix-sum helper → range sums → total).",
+      "obfuscation_handling": "Despite the obfuscated variable names, Qwen correctly inferred the recurrence pattern in the raw solution: three initial values, then each new term is the sum of the previous three, and the function returns the cumulative sum of these terms up to n. It did not rely on names to infer this; it followed the shifting of a8z_9, b_2x7, c3_q and the update d4_m8 = a8z_9 + b_2x7, and recognized the rolling-window recurrence and accumulation. In the new solution, it correctly saw that `ranges` is iterated as (start, end) pairs and that `cal_sum` is a prefix-sum helper used in an inclusion–exclusion pattern. The obfuscated names like total_9x_zq, start_8k_p, end_3m_w did not prevent it from understanding the control flow and arithmetic. The main miss (Perrin-specific semantics) is not due to obfuscation but to the fact that the code itself does not clearly encode the Perrin definition and Qwen treated it as a generic custom sequence. So robustness to obfuscation is quite good.",
+      "strengths": [
+        "Accurately identified that the raw function computes a cumulative sum of a sequence defined by a 3-term linear recurrence with three initial values.",
+        "Correctly recognized that the new function processes multiple (start, end) ranges and uses a helper prefix-sum function to compute range sums via cal_sum(end) - cal_sum(start-1).",
+        "Captured the overall input/output behavior for both raw and new problems (input n or list of ranges; output a numeric total).",
+        "Showed good structural understanding of the code logic despite heavily obfuscated variable names."
+      ],
+      "weaknesses": [
+        "Did not recognize or mention that the intended sequence is the Perrin sequence, missing the domain-specific aspect of the ground truth problem.",
+        "Raw problem description is generic and does not tie the sequence to any known mathematical definition or constraints.",
+        "In the new problem description, the phrase \"adjusting for overlapping ranges\" is slightly misleading; the code simply sums each range independently without any special overlap handling.",
+        "Does not explicitly connect the raw and new problems as a generalization from a single prefix-sum query to multiple range-sum queries over the same sequence."
+      ],
+      "key_insights": "Qwen demonstrates strong structural and algorithmic understanding of the obfuscated code: it correctly infers recurrence relations, prefix-sum usage, and range-sum computation from control flow and arithmetic alone, without relying on variable names. Its main limitation here is not in reading the code but in mapping the implementation back to the specific intended mathematical concept (Perrin numbers) stated in the ground truth. This suggests that for obfuscated or slightly nonstandard implementations of known sequences, Qwen tends to describe them as generic custom sequences rather than identifying the exact sequence family, even when it fully understands the operational behavior."
+    },
+    "computed_overall_score": 3.6666666666666665
+  }
+}

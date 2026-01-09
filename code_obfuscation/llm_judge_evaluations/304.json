@@ -1,0 +1,46 @@
+{
+  "problem_id": 304,
+  "source_files": {
+    "ground_truth": "mbpp_pro/304.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/304.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/304.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Given a square matrix of size N*N given as a list of lists, where each cell is associated with a specific cost. A path is defined as a specific sequence of cells that starts from the top-left cell move only right or down and ends on bottom right cell. We want to find a path with the maximum average over all existing paths. Average is computed as total cost divided by the number of cells visited in the path.",
+    "new_problem": "# Given a 3D matrix of size N*N*N where each cell is associated with a specific cost, find the path with the maximum average cost from the top-left cell of the front face to the bottom-right cell of the back face. A path can move right, down, or into the next depth layer. The average cost is computed as the total cost divided by the number of cells visited in the path."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code calculates the maximum average cost of a path from the top-left to the bottom-right corner of a square grid, where movement is restricted to right or down.",
+    "new_problem": "The code attempts to calculate the maximum average cost of a path in a grid, but it incorrectly references an undefined function `maxAverageOfPath` and misinterprets the input structure."
+  },
+  "judge_evaluation": {
+    "problem_id": 304,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 3.0,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, Qwen's description matches the code and the ground truth very well at the semantic level. The DP code clearly computes a maximum-sum path from the top-left to bottom-right of an N×N grid, moving only right or down, and then divides by (2*N - 1) to convert that sum into an average, using the fact that all such paths have the same fixed length. Qwen correctly states: \"maximum average cost of a path from the top-left to the bottom-right corner of a square grid, where movement is restricted to right or down.\" This captures the core purpose (max average path), the grid shape (square), the movement constraints (right or down), and the endpoints (top-left to bottom-right). The only minor omission is not explicitly mentioning that the average is implemented as total cost divided by the fixed path length, but that is implicit in \"average cost\". Hence semantic accuracy is very high (5), and completeness is also high (4) with only minor detail missing.",
+      "new_problem_evaluation": "For the new problem, the ground truth describes a 3D N×N×N grid with moves allowed in three directions (right, down, and into the next depth layer), and asks for the maximum average path from the front-top-left to the back-bottom-right. The obfuscated new solution code, however, is actually incorrect: it constructs a 2D grid g4_n7j and repeatedly calls an undefined function maxAverageOfPath on various 2D slices or projections of the 3D cost structure, then calls maxAverageOfPath again on g4_n7j. Qwen notes that the code \"attempts to calculate the maximum average cost of a path in a grid, but it incorrectly references an undefined function `maxAverageOfPath` and misinterprets the input structure.\" This shows partial understanding: Qwen recognizes that the intent is still about maximum average path in some grid-like structure and correctly flags that the implementation is flawed (undefined function, input misuse). However, it does not identify the intended 3D nature of the problem, the specific allowed moves, or the start/end cells. It also does not articulate what the code is actually doing with the 3D indices (e.g., that it is building a 2D grid from repeated 1D slices along the depth dimension). As a result, semantic accuracy is low-to-moderate (2: it knows it's about a path average in a grid, but misses the 3D semantics and detailed behavior), and completeness is also low (2) because it omits key aspects like dimensionality, movement constraints, and endpoints.",
+      "transformation_analysis": "The ground truth transformation is from a 2D N×N grid path-averaging problem (moves: right/down) to a 3D N×N×N grid path-averaging problem (moves: right/down/forward in depth). Conceptually, the new problem generalizes the dimension and the allowed moves while keeping the same objective (maximum average cost path). Qwen's descriptions do not capture this transformation. For the raw problem, it correctly identifies the 2D grid and movement constraints. For the new problem, it does not mention 3D at all, nor that the new problem is an extension of the original to an extra dimension and an extra movement direction. Instead, it focuses on the implementation issues (undefined function, misinterpreted input) without relating the new problem back to the original one. Thus, its understanding of the raw→new transformation is weak: it does not articulate that the new code is meant to adapt the 2D max-average-path logic to 3D, nor how. Score 2.",
+      "obfuscation_handling": "On the raw solution, Qwen handled obfuscation very well. Despite meaningless variable names (a3_9z, q7_m2x, etc.), it correctly inferred that this is a classic dynamic programming solution for maximum-sum path in a grid with right/down moves, and that the final division by (2*N - 1) converts sum to average. This shows it relied on control flow and index patterns rather than names. On the new solution, the obfuscation is compounded by genuinely bad or incomplete logic (undefined maxAverageOfPath, odd nested list comprehensions). Qwen correctly detects that the function is undefined and that the input structure is misused, but it does not dig into the index patterns to infer the intended 3D semantics or the intended generalization of the 2D algorithm. It essentially stops at \"this is wrong\" rather than fully reverse-engineering the intended behavior. That suggests moderate robustness: strong on clean, coherent obfuscated code, but weaker when the code is both obfuscated and structurally flawed. Overall robustness to obfuscation is therefore around the middle (3).",
+      "strengths": [
+        "Accurately identified the core semantics of the raw (2D) DP solution: maximum average path from top-left to bottom-right with right/down moves.",
+        "Did not rely on variable names; instead used the DP recurrence and boundary initialization to infer the grid-path problem.",
+        "Correctly noticed implementation issues in the new solution, such as the undefined `maxAverageOfPath` and misuse of the input structure.",
+        "Maintained the notion of \"maximum average cost of a path\" across both problems, showing some continuity of conceptual understanding."
+      ],
+      "weaknesses": [
+        "Failed to recognize or describe the 3D nature of the new problem and its allowed moves (right, down, depth).",
+        "Did not connect the new problem as a dimensional generalization of the raw problem (2D → 3D path problem).",
+        "Did not analyze the index usage in the new solution deeply enough to infer the intended 3D path semantics, focusing instead only on the undefined function error.",
+        "Omitted important details such as start/end positions and path length/average computation in the new problem description."
+      ],
+      "key_insights": "Qwen demonstrates strong semantic understanding when the code is coherent, even under heavy obfuscation: it correctly reconstructs a classic DP grid-path problem from index patterns and loop structure alone. However, when the obfuscated code is also logically flawed or incomplete, Qwen tends to focus on surface-level issues (undefined functions, misused inputs) and does not fully reconstruct the intended higher-dimensional generalization. This indicates that its robustness to obfuscation is good for standard patterns but degrades when the code deviates from a clean implementation, and it may miss the intended evolution of a problem (2D to 3D) if the new code is not a straightforward extension of the old one."
+    },
+    "computed_overall_score": 3.0
+  }
+}

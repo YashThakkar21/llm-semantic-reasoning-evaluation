@@ -1,0 +1,45 @@
+{
+  "problem_id": 281,
+  "source_files": {
+    "ground_truth": "mbpp_pro/281.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/281.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/281.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function which takes a tuple of tuples and returns the average value for each tuple as a list.",
+    "new_problem": "# Given a list of tuples of tuples, write a function that returns a list of averages for each tuple in each tuple of tuples."
+  },
+  "qwen_inference": {
+    "raw_problem": "The raw solution calculates the mean of each column in a list of lists (matrix) represented by `k3_Rp` and returns these means as a list.",
+    "new_problem": "The new solution applies a function `w8_Tz` to each element in the iterable `q5_Nh` and returns the results as a list."
+  },
+  "judge_evaluation": {
+    "problem_id": 281,
+    "semantic_accuracy_raw": 2.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 1.0,
+    "robustness_to_obfuscation": 2.0,
+    "overall_score": 2.0,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw: take a tuple of tuples and return the average value for each *inner* tuple as a list. The obfuscated raw code is:\n\n    g7_xQw = [sum(z9_Lm) / len(z9_Lm) for z9_Lm in zip(*k3_Rp)]\n    return g7_xQw\n\nThis code actually computes the average of each *column* of the 2D structure `k3_Rp` (i.e., zip(*k3_Rp) groups elements by index across inner tuples). So even ignoring the ground truth text, the code's behavior is column-wise averages, not per-inner-tuple averages.\n\nQwen's description: \"calculates the mean of each column in a list of lists (matrix) represented by `k3_Rp`\". This matches the actual code semantics quite well: it correctly identifies column-wise means and a matrix-like structure. However, compared to the ground truth problem description, this is semantically different: the ground truth wants per-tuple averages, not per-column averages. So relative to the intended problem, Qwen is not aligned, but relative to the given code, Qwen is accurate.\n\nGiven the evaluation is against the ground truth problem description, Qwen's understanding is off in the key dimension (row vs column), so semantic accuracy must be scored low. It also changes the input type from tuple-of-tuples to list-of-lists, which is a minor but real mismatch.",
+      "new_problem_evaluation": "Ground truth new: Given a *list of tuples of tuples*, return a list of averages for each tuple in each tuple of tuples. That is, we now have an outer list; each element is a tuple-of-tuples, and we want averages for each inner tuple, presumably aggregated appropriately.\n\nObfuscated new code:\n\n    return [w8_Tz(p2_Jv) for p2_Jv in q5_Nh]\n\nThis is just a generic map/comprehension applying `w8_Tz` to each element of `q5_Nh`. In the original dataset, `w8_Tz` would be the function from the raw problem (computing averages for a tuple-of-tuples), and `q5_Nh` would be the list of such structures. So semantically, the new solution is: \"for each tuple-of-tuples in the list, compute its averages using the previous function\".\n\nQwen's description: \"applies a function `w8_Tz` to each element in the iterable `q5_Nh` and returns the results as a list.\" This is a correct description of the visible code, but it is very generic and does not connect to the domain semantics (tuples of tuples, averages, etc.). It misses that `w8_Tz` is the earlier averaging function and that `q5_Nh` is a list of those structures. So while it's not wrong, it's incomplete and shallow relative to the ground truth new problem.",
+      "transformation_analysis": "Ground truth transformation: Raw problem is about computing averages for a single tuple-of-tuples. New problem generalizes this to a *list* of such structures, returning a list of results by applying the original function to each element. So the conceptual change is: lift the original function over a list (map the raw solution over a collection of inputs).\n\nQwen's raw description: column-wise means of a matrix. Qwen's new description: apply a function `w8_Tz` to each element in `q5_Nh`. Qwen does not articulate that `w8_Tz` is the raw-problem function nor that the new problem is a higher-order lifting/generalization of the original behavior to multiple inputs. It just restates the list comprehension pattern. There is no explicit recognition of the structural relationship between raw and new problems (\"now we apply the previous averaging function to each element of a list\").\n\nThus, Qwen essentially misses the transformation semantics and only describes the surface syntax of the new code.",
+      "obfuscation_handling": "For the raw code, despite obfuscation, Qwen correctly inferred that `zip(*k3_Rp)` is grouping by columns and that the code computes column-wise means. This shows it can follow Python idioms and control flow rather than relying on names. However, it did not reconcile this with the ground truth intent (per-inner-tuple averages), suggesting it focused purely on the given code, not on the described problem.\n\nFor the new code, Qwen again correctly recognized the pattern of applying a function to each element of an iterable via a list comprehension, but did not infer the higher-level semantics (that `w8_Tz` is the previously defined averaging function and `q5_Nh` is a list of tuple-of-tuples). The obfuscated names did not prevent it from understanding the syntactic pattern, but they may have discouraged it from connecting the new solution back to the raw one.\n\nOverall, Qwen handled the structural aspects of the obfuscated code reasonably well but stayed at a generic level for the new problem and did not capture the domain-specific meaning implied by the dataset.",
+      "strengths": [
+        "Correctly recognized that `zip(*k3_Rp)` followed by a comprehension computes column-wise means over a 2D structure.",
+        "Accurately described the list-comprehension pattern in the new solution as applying a function to each element of an iterable.",
+        "Did not rely on variable names; instead, it used Python idioms and structure to infer behavior."
+      ],
+      "weaknesses": [
+        "Raw problem description conflicts with the ground truth intent (per-tuple averages vs per-column averages).",
+        "Changed the data type description from tuple-of-tuples to list-of-lists, losing a detail from the ground truth.",
+        "New problem description is overly generic and does not mention tuples of tuples or averages at all.",
+        "Failed to articulate that the new solution is a lifting of the raw solution over a list of inputs (no clear understanding of the transformation)."
+      ],
+      "key_insights": "Qwen appears to prioritize a faithful description of the literal code behavior over alignment with the original natural-language problem statement. For the raw solution, it correctly inferred the column-wise averaging pattern from `zip(*...)`, demonstrating solid syntactic and idiomatic understanding even with obfuscated names. However, it did not reconcile this with the dataset's intended semantics. For the new solution, Qwen recognized the mapping pattern but did not connect it back to the original function or domain, resulting in a generic description that misses key problem-specific details. This suggests that while Qwen can parse and describe code structure under obfuscation, it struggles to infer or preserve higher-level problem semantics and transformations across related snippets."
+    },
+    "computed_overall_score": 2.0
+  }
+}

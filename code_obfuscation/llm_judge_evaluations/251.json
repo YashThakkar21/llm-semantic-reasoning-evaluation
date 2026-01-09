@@ -1,0 +1,45 @@
+{
+  "problem_id": 251,
+  "source_files": {
+    "ground_truth": "mbpp_pro/251.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/251.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/251.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find the dissimilar elements in the given two tuples.",
+    "new_problem": "# Given a list of tuples, write a function to find the dissimilar elements across all tuples. The function should return a set containing all unique dissimilar elements across the list of tuples."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet computes the symmetric difference between two sets derived from the lists `a8x_2q` and `w9_z3p`, returning the result as a tuple.",
+    "new_problem": "The code snippet generates a set `b7_m4k` by iterating over all unique pairs of elements in the list `r5_t8j`, applying the function `y6_h9s` to each pair, and updating `b7_m4k` with the results."
+  },
+  "judge_evaluation": {
+    "problem_id": 251,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 5.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 3.17,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, the ground truth is: find the dissimilar elements in two tuples. The obfuscated solution is `return tuple(set(a8x_2q) ^ set(w9_z3p))`, which computes the symmetric difference of the two inputs and returns it as a tuple. Qwen's description: \"computes the symmetric difference between two sets derived from the lists `a8x_2q` and `w9_z3p`, returning the result as a tuple.\" Semantically this is exactly what the code does and matches the intended notion of \"dissimilar elements\". The only minor mismatch is that the ground truth mentions tuples while Qwen calls them lists, but the core semantics (symmetric difference of two collections, returned as a tuple) are fully captured. It also mentions input collections, the operation (symmetric difference), and the output type. So semantic accuracy and completeness for the raw problem are both very high.",
+      "new_problem_evaluation": "For the new problem, the ground truth: given a list of tuples, find all dissimilar elements across all tuples, returning a set of all unique dissimilar elements. The typical implementation pattern is to iterate over all pairs of tuples and apply the raw-problem function (symmetric difference) to each pair, accumulating results in a set. The obfuscated code:\n\n```python\nb7_m4k = set()\nfor q2_n in range(len(r5_t8j)):\n    for x3_v in range(q2_n + 1, len(r5_t8j)):\n        b7_m4k.update(y6_h9s(r5_t8j[q2_n], r5_t8j[x3_v]))\nreturn b7_m4k\n```\n\nThis indeed iterates over all unique index pairs (i, j) with i < j in the list `r5_t8j`, applies `y6_h9s` to each pair, and updates a set with the results. Qwen's description: \"generates a set `b7_m4k` by iterating over all unique pairs of elements in the list `r5_t8j`, applying the function `y6_h9s` to each pair, and updating `b7_m4k` with the results.\" This is an accurate low-level description of the control flow and data flow, but it completely misses the semantic intent: that `r5_t8j` is a list of tuples, `y6_h9s` is the dissimilar-elements (symmetric difference) function from the raw problem, and the final set is the union of all dissimilar elements across all tuples. It does not mention tuples, dissimilar elements, or the goal of aggregating unique elements across the entire list. Thus, while Qwen correctly describes the loops and set updates, it fails to connect them to the higher-level problem statement. Semantic accuracy is low (it only captures mechanics, not purpose), and completeness is low because the key problem-level aspects are missing.",
+      "transformation_analysis": "The transformation from raw to new problem is: extend from computing dissimilar elements between two tuples to computing dissimilar elements across a list of tuples by applying the original function to all tuple pairs and aggregating. Qwen clearly recognizes in the new code that there is iteration over all unique pairs and that a function `y6_h9s` is applied to each pair with results accumulated in a set. However, Qwen does not relate `y6_h9s` back to the raw-problem function (symmetric difference of two tuples) nor does it state that the overall goal is to find dissimilar elements across all tuples. There is no explicit understanding that the new problem generalizes the raw one from two inputs to many via pairwise combination and union. Therefore, its understanding of the raw→new transformation is weak: it captures the structural change (pairwise iteration and accumulation) but not the semantic evolution of the problem.",
+      "obfuscation_handling": "The obfuscation mainly affects variable and function names. For the raw solution, Qwen handled obfuscation very well: it ignored the meaningless names and correctly inferred that `set(a8x_2q) ^ set(w9_z3p)` is a symmetric difference and that the result is converted to a tuple. This shows strong reliance on Python operators and types rather than names.\n\nFor the new solution, Qwen again correctly understood the control structure (nested loops over indices, unique pairs via `range(q2_n + 1, ...)`, set accumulation via `.update`). However, it stopped at this syntactic description and did not infer the higher-level semantics that `y6_h9s` is likely the previously defined dissimilar-elements function and that `r5_t8j` is a list of tuples. The obfuscation of `y6_h9s` and `r5_t8j` likely contributed to this, as Qwen did not attempt to connect the new code to the raw code's behavior. So robustness is mixed: strong on local code semantics, weaker on cross-function semantic linkage under obfuscated names.",
+      "strengths": [
+        "Precisely identified that the raw solution computes the symmetric difference of two collections and returns it as a tuple.",
+        "Correctly described the control flow of the new solution: iterating over all unique index pairs and updating a set with the results of a function call.",
+        "Did not rely on variable names to understand the operator `^`, `set()`, and `.update`, showing good syntactic and API-level understanding."
+      ],
+      "weaknesses": [
+        "For the new problem, failed to recognize that the function `y6_h9s` is semantically the dissimilar-elements function from the raw problem.",
+        "Did not mention that `r5_t8j` is a list of tuples or that the goal is to find dissimilar elements across all tuples.",
+        "Did not articulate the higher-level semantic relationship between the raw and new problems (generalizing from two tuples to a list of tuples via pairwise symmetric differences and union).",
+        "Focused on low-level iteration and set-updating mechanics rather than the conceptual task in the new problem."
+      ],
+      "key_insights": "Qwen demonstrates strong local semantic understanding of individual expressions and control structures, even under obfuscated naming, as seen in its perfect interpretation of the raw solution and accurate mechanical description of the new solution. However, it struggles to infer the higher-level problem intent when that requires linking an obfuscated helper function (`y6_h9s`) back to a previously understood operation (symmetric difference) and recognizing that the new code is a generalization of the original task. This suggests that while Qwen is robust to obfuscation at the statement and function-body level, its ability to reconstruct problem-level semantics and cross-function relationships under obfuscation is limited. It tends to describe what the code does step by step rather than why it does it, especially in more complex, multi-step transformations."
+    },
+    "computed_overall_score": 3.1666666666666665
+  }
+}

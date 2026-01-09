@@ -1,0 +1,45 @@
+{
+  "problem_id": 152,
+  "source_files": {
+    "ground_truth": "mbpp_pro/152.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/152.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/152.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to find the maximum value in a given heterogeneous list.",
+    "new_problem": "# Given a list of heterogeneous lists, write a function to find the maximum value across all the lists."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code finds and returns the maximum integer value from the list w2m_v.",
+    "new_problem": "The code applies a function x9_m1 to each element in the list n5_h8w, then returns the maximum value from the resulting list."
+  },
+  "judge_evaluation": {
+    "problem_id": 152,
+    "semantic_accuracy_raw": 3.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 2.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 1.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.17,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "Ground truth raw problem: find the maximum value in a heterogeneous list (i.e., list with mixed types). The obfuscated code does this by taking max over elements that are instances of int.\n\nQwen's inference: \"The code finds and returns the maximum integer value from the list w2m_v.\" Semantically, this matches the actual code behavior: it filters by isinstance(z8q, int) and then takes max. However, compared to the *problem description*, Qwen narrows the task to integers only and does not mention heterogeneity or that non-int elements are ignored. The ground truth description is type-agnostic (\"maximum value\" in a heterogeneous list), whereas the implementation and Qwen's description are int-specific.\n\nThus, Qwen correctly understood what the given code does, but did not capture the more general intent of the original problem statement and missed the nuance that the list is heterogeneous and that the function is effectively selecting among a subset of elements. This yields moderate semantic accuracy and low completeness relative to the ground truth problem.",
+      "new_problem_evaluation": "Ground truth new problem: given a list of heterogeneous lists, find the maximum value across all the lists. Conceptually, this is a 2D structure (list of lists) and we want the global maximum.\n\nObfuscated new solution: it builds k7_p2q = [x9_m1(r4_t) for r4_t in n5_h8w] and returns max(k7_p2q). Without seeing x9_m1's definition, the structural pattern is: apply some function to each element of n5_h8w, collect results, then take the max. In the original dataset, x9_m1 presumably computes the maximum of each sublist, so max over those gives the global maximum.\n\nQwen's inference: \"The code applies a function x9_m1 to each element in the list n5_h8w, then returns the maximum value from the resulting list.\" This is a faithful description of the *literal* code snippet, but it completely misses the higher-level semantics from the ground truth (that n5_h8w is a list of lists, that x9_m1 is intended to extract per-sublist maxima, and that the goal is the maximum across all sublists). It also omits any mention of heterogeneity.\n\nSo Qwen understood the immediate control/data flow but not the intended problem semantics. Semantic accuracy is low relative to the ground truth problem, and completeness is also low.",
+      "transformation_analysis": "Ground truth transformation: raw → new goes from operating on a single heterogeneous list to operating on a list of heterogeneous lists and finding the global maximum. Conceptually, the new problem generalizes the domain from 1D to 2D and composes the original operation (max over one list) across sublists, then aggregates.\n\nQwen's raw description: \"finds and returns the maximum integer value from the list w2m_v.\" Qwen's new description: \"applies a function x9_m1 to each element in the list n5_h8w, then returns the maximum value from the resulting list.\" Qwen does not connect x9_m1 back to the original max-finding behavior, nor does it identify that n5_h8w is a list of lists and that the new code is essentially mapping the original function over sublists and then taking a max of those results. There is no recognition of the structural transformation (single list → list of lists; direct max → map-then-max composition).\n\nAs a result, Qwen shows almost no understanding of how the new problem evolves from the raw one; it only restates the surface-level operations of each snippet independently.",
+      "obfuscation_handling": "For the raw solution, despite obfuscated names, the structure `max(z8q for z8q in w2m_v if isinstance(z8q, int))` is straightforward. Qwen correctly inferred that it returns the maximum integer from the list. This indicates reasonable robustness to obfuscation at the code-structure level.\n\nFor the new solution, Qwen correctly recognized the list comprehension and max pattern, but stopped at a purely syntactic description: \"apply x9_m1 to each element, then max.\" It did not infer the likely role of x9_m1 (e.g., computing a maximum per sublist) or that n5_h8w is a list of lists. Some of this limitation is due to missing context (no definition of x9_m1), but a stronger semantic model might hypothesize the intended composition with the earlier function, especially in a problem-evolution setting.\n\nOverall, Qwen handled the obfuscated variable names adequately for local control-flow understanding, but struggled to reconstruct the higher-level problem semantics and the relationship between the two snippets.",
+      "strengths": [
+        "Correctly identified that the raw code computes a maximum over integer elements in the list, despite obfuscated identifiers.",
+        "Accurately described the structural behavior of the new code (map a function over a list, then take max).",
+        "Showed that it can ignore misleading variable names and focus on Python constructs like comprehensions, isinstance, and max."
+      ],
+      "weaknesses": [
+        "Did not mention that the original list is heterogeneous or that non-int elements are filtered out, reducing alignment with the ground truth problem.",
+        "Failed to recognize that the new problem operates over a list of lists and aims for a global maximum across all sublists.",
+        "Did not connect x9_m1 in the new solution back to the original max-finding behavior, missing the compositional transformation from raw to new.",
+        "Descriptions remain at a low-level code-structure view and do not reconstruct the higher-level problem intent present in the ground truth statements."
+      ],
+      "key_insights": "Qwen demonstrates that it can parse and describe local code behavior even with obfuscated names, especially for simple patterns like filtering with isinstance and using max or list comprehensions. However, it tends to mirror the literal code rather than infer the more abstract problem semantics, particularly when some context (like the definition of x9_m1) is missing. This leads to reasonable semantic accuracy for the raw snippet but poor alignment with the intended problem descriptions and with the transformation from a single-list max problem to a list-of-lists global max problem. The model is robust to obfuscation at the syntactic level but weaker at reconstructing higher-level intent and relationships between related pieces of code."
+    },
+    "computed_overall_score": 2.1666666666666665
+  }
+}

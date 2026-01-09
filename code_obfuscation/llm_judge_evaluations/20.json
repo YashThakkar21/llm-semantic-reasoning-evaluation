@@ -1,0 +1,46 @@
+{
+  "problem_id": 20,
+  "source_files": {
+    "ground_truth": "mbpp_pro/20.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/20.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/20.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a python function to find smallest number in a list.",
+    "new_problem": "# Write a Python function to find the smallest number in each sublist of a list of lists, and then return the smallest number among these smallest numbers."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code snippet finds and returns the minimum value from a non-empty list named x9z_2q.",
+    "new_problem": "The code snippet applies a function f5_kR9p to each element in a non-empty list a8_qX3z, then applies the same function to the resulting list and returns the final result."
+  },
+  "judge_evaluation": {
+    "problem_id": 20,
+    "semantic_accuracy_raw": 5.0,
+    "semantic_accuracy_new": 3.0,
+    "completeness_raw": 5.0,
+    "completeness_new": 2.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 4.0,
+    "overall_score": 3.5,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, the ground truth is: find the smallest number in a list. The obfuscated code is simply an assertion that the list is non-empty followed by `return min(x9z_2q)`. Qwen's inferred description: \"The code snippet finds and returns the minimum value from a non-empty list named x9z_2q.\" This matches the semantics exactly: it identifies that the input is a non-empty list, that the operation is to find the minimum element, and that this value is returned. It also captures the non-emptiness constraint implied by the assertion. There is no missing nuance here, so both semantic accuracy and completeness for the raw problem are maximal.",
+      "new_problem_evaluation": "Ground truth new problem: given a list of lists, find the smallest number in each sublist, then return the smallest among those minima (i.e., a two-level min: inner over sublists, then outer over those results). The obfuscated new solution asserts non-empty `a8_qX3z`, builds `b7_Yw2m = [f5_kR9p(v3_Ln8x) for v3_Ln8x in a8_qX3z]`, then returns `f5_kR9p(b7_Yw2m)`. Given the original context, `f5_kR9p` is the function that finds the minimum in a list. So semantically, the code is: apply the min-finding function to each sublist, then apply it again to the list of minima. Qwen's description: \"applies a function f5_kR9p to each element in a non-empty list a8_qX3z, then applies the same function to the resulting list and returns the final result.\" This captures the structural pattern (map a function over elements, then apply it again to the collected results) and the non-empty constraint, but it does not identify that `f5_kR9p` is specifically a min function, nor that `a8_qX3z` is a list of lists and that the overall goal is to find the global smallest number. As a result, the semantic accuracy is partial: the control/data flow is right, but the core numerical semantics (\"smallest number in each sublist, then smallest of those\") are not explicitly recognized. Completeness is lower because the crucial detail that the elements are sublists and that the function is a min operation is omitted, and thus the high-level problem description (nested minimum over list-of-lists) is not clearly captured.",
+      "transformation_analysis": "The ground truth transformation from raw to new problem is: extend a simple \"min of a flat list\" function into a higher-order use where that same min function is applied first to each sublist in a list-of-lists, then to the list of those minima, effectively composing the original solution to handle nested structure. Qwen's raw description correctly identifies the original as a min-over-list function. In the new description, Qwen notes that the same function is applied to each element of a list and then again to the resulting list. This shows some understanding that the new solution reuses the original function in a higher-order way. However, Qwen does not connect this explicitly back to \"finding minima\" or to the idea of a list of lists and nested minima. It describes the transformation at a very generic functional-programming level (map then fold-like reuse) without articulating the specific problem evolution from \"min of list\" to \"min of minima over list-of-lists\". Thus, there is partial understanding of the structural transformation (reuse of the same function at two levels) but not of the semantic transformation in terms of the problem domain, warranting a low-to-moderate score.",
+      "obfuscation_handling": "The variable and function names are heavily obfuscated (`x9z_2q`, `a8_qX3z`, `f5_kR9p`), yet Qwen correctly inferred the behavior of the raw solution as computing the minimum of a non-empty list, which indicates it relied on the `min(...)` call and assertion rather than names. For the new solution, Qwen correctly recognized the pattern of applying the same function to each element and then to the resulting list, again ignoring the meaningless names. However, it did not infer from context that `f5_kR9p` is the previously defined min function and that the elements are sublists. This suggests that Qwen is robust to obfuscation at the level of basic control and data flow, but less effective at integrating cross-snippet context (that `f5_kR9p` is the same min function from the raw problem) to reconstruct the higher-level semantics. Overall, it handled obfuscation well for direct code reading, but missed the deeper semantic linkage between the two problems.",
+      "strengths": [
+        "Precisely identified the behavior of the raw solution as returning the minimum value from a non-empty list.",
+        "Captured the non-empty input constraint implied by the assertion in both raw and new solutions.",
+        "Recognized the structural pattern in the new solution: applying the same function to each element of a list and then to the list of results.",
+        "Showed robustness to meaningless variable and function names, relying instead on code structure and built-in functions."
+      ],
+      "weaknesses": [
+        "Did not explicitly recognize that `f5_kR9p` in the new solution is the same min-finding function from the raw problem.",
+        "Failed to state that the input in the new problem is a list of lists and that the goal is to find the smallest number overall via nested minima.",
+        "New problem description is overly generic and does not mention minima or numeric semantics, losing the core problem meaning.",
+        "Transformation understanding is limited to a generic functional pattern and does not articulate the specific evolution from \"min of list\" to \"min of minima over list-of-lists\"."
+      ],
+      "key_insights": "Qwen demonstrates strong local semantic understanding of straightforward code, even when names are obfuscated, as seen in its perfect interpretation of the raw solution. It also correctly identifies higher-order structural patterns (map a function over elements, then apply it again) in the new solution. However, it struggles to integrate context across related snippets: it does not connect that the same function used twice is specifically a min function, nor that the data structure has become a list of lists. This leads to a generic but structurally accurate description that misses the key domain semantics (nested minimum). The evaluation suggests that Qwen is robust to obfuscation at the level of individual snippets and control flow, but less adept at reconstructing higher-level problem transformations and reusing semantic knowledge of previously inferred functions."
+    },
+    "computed_overall_score": 3.5
+  }
+}

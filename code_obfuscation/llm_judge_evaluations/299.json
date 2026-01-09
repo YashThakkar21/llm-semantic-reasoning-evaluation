@@ -1,0 +1,46 @@
+{
+  "problem_id": 299,
+  "source_files": {
+    "ground_truth": "mbpp_pro/299.json",
+    "qwen_response": "qwen_code_obfuscation_description_response/299.json",
+    "obfuscated_code": "mbpp_pro_code_obfuscation/299.json"
+  },
+  "ground_truth": {
+    "raw_problem": "# Write a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.",
+    "new_problem": "# Given a list of lists of names, write a function to sum the total length of the names across all lists after removing the names that start with a lowercase letter from each list."
+  },
+  "qwen_inference": {
+    "raw_problem": "The code filters a list of strings to include only those that start with an uppercase letter followed by lowercase letters, then returns the total length of the concatenated filtered strings.",
+    "new_problem": "The code calculates the sum of values returned by the function `sample_nam` applied to each element in the list `complex_names`. Note: There is likely a typo in the function name `sample_nam`."
+  },
+  "judge_evaluation": {
+    "problem_id": 299,
+    "semantic_accuracy_raw": 4.0,
+    "semantic_accuracy_new": 2.0,
+    "completeness_raw": 4.0,
+    "completeness_new": 1.0,
+    "transformation_understanding": 2.0,
+    "robustness_to_obfuscation": 3.0,
+    "overall_score": 2.67,
+    "detailed_analysis": {
+      "raw_problem_evaluation": "For the raw problem, Qwen's description is: \"The code filters a list of strings to include only those that start with an uppercase letter followed by lowercase letters, then returns the total length of the concatenated filtered strings.\" The ground truth is: \"sum the length of the names of a given list of names after removing the names that start with a lowercase letter.\" Semantically, Qwen correctly identifies that: (1) the input is a list of strings (names), (2) filtering is based on the first character being uppercase, (3) the result is a total length of the remaining names. Qwen even adds the more precise condition from the code (`el[0].isupper() and el[1:].islower()`), which is stricter than the textual ground truth but consistent with the actual code. The only minor mismatch is that the ground truth only mentions removing names that start with lowercase, while the code (and Qwen) also requires the rest of the name to be lowercase. However, since the evaluation is about understanding the code, Qwen's description is accurate to the snippet. Completeness-wise, Qwen captures the core behavior: filtering by capitalization and summing total length via concatenation. It does not explicitly say \"sum of lengths of names\" but \"total length of the concatenated filtered strings\" is equivalent. It does not mention edge cases (e.g., empty strings), but neither does the ground truth. Overall, this is a strong match with slight over-specification compared to the natural-language ground truth, hence high scores but not perfect.",
+      "new_problem_evaluation": "For the new problem, the ground truth is: \"Given a list of lists of names, write a function to sum the total length of the names across all lists after removing the names that start with a lowercase letter from each list.\" The obfuscated new solution is just: `return sum(sample_nam(names) for names in complex_names)`. The intended semantics (from the dataset) are that `sample_nam` is the raw-problem function applied to each inner list, and the outer function aggregates the total length across all sublists. Qwen's description is: \"The code calculates the sum of values returned by the function `sample_nam` applied to each element in the list `complex_names`. Note: There is likely a typo in the function name `sample_nam`.\" This is only a structural description of the one-line code and does not connect it back to the semantics of `sample_nam` (filtering names by capitalization and summing lengths) nor does it mention that `complex_names` is a list of lists of names or that the final result is the total length of all valid names across all sublists. So semantically, Qwen only partially understands: it knows there is a sum over function results, but it does not articulate what those results represent. That is a big gap relative to the ground truth. Completeness is very low: it misses the list-of-lists structure, the filtering condition, and the fact that the final quantity is a total length of names. Hence low scores for semantic accuracy and completeness on the new problem.",
+      "transformation_analysis": "The transformation from raw to new problem is: take the original function that processes a single list of names (filter by capitalization and sum lengths), and then define a new function that takes a list of such lists and returns the sum of applying the original function to each sublist. Conceptually, it's a higher-order aggregation: map the original solution over each inner list and sum the results. Qwen's new-problem description only states that the code \"calculates the sum of values returned by the function `sample_nam` applied to each element in the list `complex_names`\". This shows some understanding of the syntactic transformation (sum over function calls on each element), but it does not connect it to the semantics of the raw problem at all. It doesn't say that each element is itself a list of names, nor that `sample_nam` is the previously defined name-filter-and-length-sum function. Therefore, Qwen partially grasps the structural transformation (sum of per-element results) but not the semantic evolution (from single list to list of lists, and from single total length to aggregated total length). This warrants a low-to-moderate score for transformation understanding.",
+      "obfuscation_handling": "The variable names here (`sample_names`, `sample_nam`, `complex_names`) are not deeply obfuscated, but they are somewhat unhelpful, and the new solution is extremely minimal. For the raw code, Qwen clearly relied on the actual operations (`el[0].isupper()`, `el[1:].islower()`, `len(''.join(...))`) rather than names, and correctly inferred the filtering and length-summing behavior. That indicates good robustness to naming issues at the raw level. For the new code, however, Qwen essentially paraphrased the syntax without inferring the underlying semantics of `sample_nam` or the structure of `complex_names`. It did not leverage its prior understanding of the raw function to infer that the new function aggregates over a list of lists of names. This suggests that while Qwen can read local logic well, it did not integrate context across snippets or reason that `sample_nam` is the previously defined function. The obfuscation (or at least the lack of explicit type hints) in the new snippet seems to have limited its semantic inference. Overall robustness is middling: strong on the raw snippet, weak on the composed/higher-order snippet.",
+      "strengths": [
+        "Accurately inferred the core behavior of the raw function: filtering names by capitalization and summing total length.",
+        "Correctly interpreted the specific character-based conditions (`isupper` on first char, `islower` on the rest) from the code.",
+        "Recognized that the raw solution returns the total length via concatenation and `len`, not, for example, a list of filtered names.",
+        "Identified the structural pattern in the new solution (sum of function results over a list)."
+      ],
+      "weaknesses": [
+        "For the new problem, failed to connect `sample_nam` back to the previously understood semantics of the raw function.",
+        "Did not recognize or state that `complex_names` is a list of lists of names, and that each element is processed as a sublist.",
+        "New-problem description is purely syntactic and misses the key semantic goal: total length of all valid names across all sublists.",
+        "Transformation understanding is shallow: it notes summation over function calls but not the conceptual shift from single list to list of lists."
+      ],
+      "key_insights": "Qwen demonstrates solid local semantic understanding when the code directly exposes operations on data (as in the raw snippet with explicit string methods and concatenation). It can infer meaningful problem statements even when variable names are not very informative. However, when the code becomes more compositional and relies on previously defined functions (as in the new snippet that just sums `sample_nam(names)` over `complex_names`), Qwen tends to fall back to a surface-level description of the control structure rather than reconstructing the full semantics by linking to earlier context. This suggests that its robustness to obfuscation and poor naming is good at the function-local level but weaker when higher-order composition or cross-snippet reasoning is required."
+    },
+    "computed_overall_score": 2.6666666666666665
+  }
+}
