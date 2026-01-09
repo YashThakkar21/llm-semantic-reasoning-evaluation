@@ -83,10 +83,10 @@ python 3_llm_judge_error_detection.py --skip-existing
 
 ## Results
 
-- 119+ evaluations completed
-- Overall performance: 2.99/5.0
-- Best dimension: Error Location Precision (3.53/5.0)
-- Weakest dimension: Completeness (2.41/5.0)
+- 374 evaluations completed
+- Overall performance: 2.83/5.0
+- Best dimension: Error Location Precision (3.46/5.0)
+- Weakest dimension: Completeness (2.22/5.0)
 
 ## Helper Script
 

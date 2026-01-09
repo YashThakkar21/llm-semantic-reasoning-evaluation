@@ -1,6 +1,6 @@
-# Program Synthesis Evaluation Framework
+# Beyond Surface Cues: Evaluating Semantic Reasoning in Large Language Models
 
-A framework for evaluating code language models' capabilities in understanding code semantics and detecting errors. Evaluates **Qwen2.5-Coder-32B-Instruct** on two tasks using the **MBPP-Pro** dataset.
+Large language models (LLMs) are increasingly used for software development tasks like code summarization, debugging, and program understanding. While these models show strong benchmark performance, it remains unclear whether they genuinely understand program semantics or merely rely on surface-level cues like variable names and code patterns. This project directly evaluates the robustness of **Qwen2.5-Coder-32B-Instruct** by testing its ability to understand code semantics when such cues are removed through identifier obfuscation and by assessing its error detection capabilities on validated buggy code. The findings reveal that while the model captures high-level program intent effectively, it struggles with deeper, multi-step reasoning required for precise error localization and classification, highlighting important limitations for real-world debugging applications.
 
 ## Overview
 
@@ -90,10 +90,10 @@ python 3_llm_judge_error_detection.py --skip-existing
 - Metrics: Semantic accuracy, completeness, transformation understanding, robustness
 
 ### Error Detection
-- 119+ evaluations
-- Overall: 2.99/5.0
-- Best: Error Location Precision (3.53/5.0)
-- Weakest: Completeness (2.41/5.0)
+- 374 evaluations
+- Overall: 2.83/5.0
+- Best: Error Location Precision (3.46/5.0)
+- Weakest: Completeness (2.22/5.0)
 
 ## Dependencies
 
@@ -104,3 +104,6 @@ For detailed pipeline documentation:
 - [`code_obfuscation/README.md`](code_obfuscation/README.md)
 - [`error_detection/README.md`](error_detection/README.md)
 
+## Acknowledgments
+
+This project used generative AI tools for code generation and brainstorming during development, but all written content was authored independently.
