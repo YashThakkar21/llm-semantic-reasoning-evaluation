@@ -14,6 +14,16 @@ Both pipelines follow three stages:
 - **Stage 2**: Evaluate Qwen's performance
 - **Stage 3**: Use ChatGPT as an LLM-as-a-Judge to evaluate Qwen's responses
 
+## 📄 Full Report
+
+<details>
+<summary>Click to view the full PDF report</summary>
+
+[Open written_report.pdf](written_report.pdf)
+
+</details>
+
+
 ## Repository Structure
 
 ```
