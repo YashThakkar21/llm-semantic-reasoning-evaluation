@@ -16,10 +16,7 @@ Both pipelines follow three stages:
 
 ## 📄 Full Report
 
-<summary>Click to view the full PDF report</summary>
-
 [Open written_report.pdf](written_report.pdf)
-
 
 
 ## Repository Structure
