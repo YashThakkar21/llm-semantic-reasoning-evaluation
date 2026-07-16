@@ -1,4 +1,4 @@
-# Beyond Surface Cues: Evaluating Semantic Reasoning in Large Language Models
+# Beyond Surface Cues: Evaluating Semantic Reasoning in Large Language Models ·  [Paper](https://drive.google.com/file/d/1Dv7dyQ8Gn4GhO2I7vKpTKfy15nOibzOd/view?usp=sharing)
 
 Large language models (LLMs) are increasingly used for software development tasks like code summarization, debugging, and program understanding. While these models show strong benchmark performance, it remains unclear whether they genuinely understand program semantics or merely rely on surface-level cues like variable names and code patterns. This project directly evaluates the robustness of **Qwen2.5-Coder-32B-Instruct** by testing its ability to understand code semantics when such cues are removed through identifier obfuscation and by assessing its error detection capabilities on validated buggy code. The findings reveal that while the model captures high-level program intent effectively, it struggles with deeper, multi-step reasoning required for precise error localization and classification, highlighting important limitations for real-world debugging applications.
 
